@@ -177,6 +177,7 @@
   .login-box .btn-masuk:hover { background:#047857; }
   .login-box .btn-masuk:active { transform:translateY(1px); background:#065f46; }
   .login-box .btn-masuk:disabled { background:#6ee7b7; cursor:wait; }
+  .pinlain { border-top:1px dashed var(--line); margin-top:12px; padding-top:12px; }
   .pin-msg { color:var(--danger); font-size:13px; min-height:18px; margin-top:10px; }
   .login-box .foot { font-size:11.5px; color:#94a3b8; margin-top:14px; }
   .linkbtn { background:none; border:0; color:var(--muted); cursor:pointer; font:inherit; font-size:12px; text-decoration:underline; padding:0 4px; }
@@ -399,6 +400,14 @@ const ICON_ADMIN='<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H1
 const ICON_PA='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
 const ICON_PI='<svg viewBox="0 0 24 24"><path d="M12 3c-3.5 0-5.5 2.6-5.5 6v2.5c0 2.2-.8 3.3-1.5 4h14c-.7-.7-1.5-1.8-1.5-4V9c0-3.4-2-6-5.5-6z"/><circle cx="12" cy="9.5" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>';
 const ROLE_DESC={admin:["Bagian ketahfidhan · akses putra & putri",ICON_ADMIN], Pa:["Pengurus hafalan santri putra",ICON_PA], Pi:["Pengurus hafalan santri putri",ICON_PI]};
+async function gantiPinAkun(){
+  const sel=document.getElementById("pin-target"); const target=sel.value, nama=sel.options[sel.selectedIndex].text;
+  const n=prompt("PIN baru untuk "+nama+" (6–12 angka):"); if(n==null) return;
+  if(!/^\d{6,12}$/.test(n.trim())){ alert("PIN harus 6 sampai 12 angka."); return; }
+  if(!confirm("Tetapkan PIN baru untuk "+nama+"?")) return;
+  try{ await api("rpc/set_pin",{method:"POST",body:JSON.stringify({target_email:target, pin_baru:n.trim()})}); alert("PIN "+nama+" diperbarui."); }
+  catch(e){ const m=(e.message.match(/"message":"([^"]+)"/)||[])[1]; alert("Gagal: "+(m||(e instanceof TypeError?"tidak ada koneksi internet.":"fungsi set_pin belum dipasang di server (jalankan supabase/admin_pin.sql)."))); }
+}
 function viewLogin(){ return `<div class="login"><div class="login-box">
   <div class="logo-frame"><img src="${LOGO}" alt="Logo Ketahfidhan PTQ"></div>
   <h1>Monitoring Hafalan Santri</h1>
@@ -746,7 +755,18 @@ function viewAtur(){
       <button class="btn secondary" onclick="syncPull()">↻ Muat ulang dari server</button>
       ${readOnly?"":`<button class="btn secondary" onclick="gantiPin()">Ganti PIN ${isAdmin()?"Ketahfidhan":"saya"}</button>`}
       <button class="btn danger" onclick="logout()">Keluar</button></div>
-    ${isAdmin()&&!readOnly?`<p class="small muted">Lupa PIN: atur ulang sandi akun di dasbor Supabase, menu Authentication → Users. Akun penulis: <code>putra@</code>, <code>putri@</code>; akun pembaca (lihat saja): <code>lihat.ketahfidhan@</code>, <code>lihat.putra@</code>, <code>lihat.putri@ptqamsa.id</code>.</p>`:""}
+    ${isAdmin()&&!readOnly?`<div class="pinlain"><b class="small">Ganti PIN akun lain</b>
+      <div class="toolbar" style="margin-top:6px">
+        <select id="pin-target">
+          <option value="lihat.ketahfidhan@ptqamsa.id">Pembaca Ketahfidhan (lihat putra &amp; putri)</option>
+          <option value="lihat.putra@ptqamsa.id">Pembaca Marhalah Putra</option>
+          <option value="lihat.putri@ptqamsa.id">Pembaca Marhalah Putri</option>
+          <option value="putra@ptqamsa.id">Penulis Marhalah Putra</option>
+          <option value="putri@ptqamsa.id">Penulis Marhalah Putri</option>
+        </select>
+        <button class="btn secondary" onclick="gantiPinAkun()">Tetapkan PIN baru</button>
+      </div>
+      <p class="small muted">PIN baru langsung berlaku untuk semua perangkat. Pemegang PIN lama tidak bisa masuk lagi.</p></div>`:""}
   </div>`;
   const kartuEkspor = `<div class="card"><h2>Unduh salinan data</h2>
     <div class="toolbar">

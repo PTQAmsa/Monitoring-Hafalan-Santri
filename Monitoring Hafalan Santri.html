@@ -321,7 +321,7 @@ async function api(path, opt={}){
   const t=await tokenValid();
   const r=await fetch(SB_URL+"/rest/v1/"+path,{...opt, headers:{apikey:SB_KEY, Authorization:"Bearer "+t, "Content-Type":"application/json", ...(opt.headers||{})}});
   if(!r.ok){ const x=await r.text(); throw Object.assign(new Error(x.slice(0,300)),{status:r.status}); }
-  return r.status===204 ? null : r.json(); }
+  const txt=await r.text(); return txt ? JSON.parse(txt) : null; } // 201/204 tanpa badan = berhasil
 
 /* ---------- masuk / keluar ---------- */
 function pickRole(r){ pendingRole=r; document.querySelectorAll(".role-btn").forEach(b=>b.classList.toggle("active", b.dataset.role===r)); const i=document.getElementById("pin"); if(i){ i.value=""; i.focus(); } }

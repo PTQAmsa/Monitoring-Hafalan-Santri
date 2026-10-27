@@ -1,7 +1,7 @@
 /* Service worker: menyimpan aplikasi di HP agar bisa dibuka tanpa internet
    setelah pemasangan pertama. Naikkan VERSI setiap kali file HTML diperbarui
    supaya HP para guru mengambil versi terbaru saat online. */
-const VERSI = "hafalan-v12";
+const VERSI = "hafalan-v13";
 const BERKAS = [
   "./Monitoring%20Hafalan%20Santri.html",
   "./manifest.webmanifest",

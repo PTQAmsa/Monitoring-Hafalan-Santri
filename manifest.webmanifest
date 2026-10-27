@@ -1,6 +1,6 @@
 {
   "name": "Monitoring Hafalan Santri",
-  "short_name": "Hafalan",
+  "short_name": "Hafalan Santri PTQ",
   "description": "Sistem monitoring perkembangan hafalan santri PTQ, Bagian Ketahfidhan",
   "start_url": "./Monitoring%20Hafalan%20Santri.html",
   "scope": "./",

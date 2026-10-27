@@ -152,24 +152,46 @@
   svg.chart .series-label { font-size:10.5px; font-weight:600; }
 
   /* ---------- Layar masuk (peran + PIN) ---------- */
-  .login { min-height:calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding:20px 0; }
-  .login-box { background:#d7ecdf; border:2px solid #0f766e; border-radius:14px; box-shadow:var(--shadow-md); padding:28px 26px 22px; width:100%; max-width:380px; text-align:center; }
-  .login-box img { width:96px; height:96px; object-fit:contain; }
-  .login-box h1 { font-size:18px; color:var(--primary); margin:10px 0 4px; }
-  .roles { display:grid; gap:8px; margin:16px 0 12px; }
-  .role-btn { border:1px solid var(--line-strong); background:#fff; border-radius:8px; padding:11px; cursor:pointer; font:inherit; font-weight:600; color:var(--ink); min-height:44px; transition:all .15s; }
-  .role-btn:hover { border-color:var(--accent); }
-  .role-btn.active { border-color:var(--accent); background:var(--accent-soft); color:var(--primary); box-shadow:0 0 0 3px var(--accent-ring); }
-  .login-box input { width:100%; text-align:center; font-size:18px; letter-spacing:6px; margin-bottom:10px; min-height:46px; }
-  .login-box .btn { width:100%; justify-content:center; }
-  .pin-msg { color:var(--danger); font-size:13px; min-height:18px; margin-top:8px; }
+  .login { min-height:calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding:24px 12px; background:#f8fafc; }
+  .login-box { background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.06); padding:32px 28px 24px; width:100%; max-width:420px; text-align:center; }
+  .login-box .logo-frame { width:112px; height:112px; margin:0 auto 14px; border-radius:50%; background:#f0fdf4; border:1px solid #dcfce7; display:flex; align-items:center; justify-content:center; }
+  .login-box .logo-frame img { width:88px; height:88px; object-fit:contain; }
+  .login-box h1 { font-size:20px; font-weight:700; color:#0f172a; margin:4px 0 6px; letter-spacing:-.2px; }
+  .login-box .sub { font-size:14px; color:#64748b; margin:0 0 18px; line-height:1.5; }
+  .login-box .net { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; border-radius:999px; padding:4px 12px; margin-bottom:16px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; }
+  .login-box .net.off { background:#fff7ed; color:#b45309; border-color:#fed7aa; }
+  .login-box .net::before { content:"●"; font-size:10px; }
+  .roles { display:grid; gap:10px; margin:0 0 16px; text-align:left; }
+  .role-btn { display:flex; align-items:center; gap:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; cursor:pointer; font:inherit; color:#334155; min-height:52px; transition:all .15s; box-sizing:border-box; }
+  .role-btn .ic { width:34px; height:34px; border-radius:10px; background:#fff; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:16px; flex:none; }
+  .role-btn .t { display:flex; flex-direction:column; line-height:1.2; }
+  .role-btn .t small { font-size:11.5px; color:#64748b; font-weight:400; margin-top:2px; }
+  .role-btn:hover { border-color:#a7f3d0; background:#f0fdf4; }
+  .role-btn.active { background:#ecfdf5; border:2px solid #059669; color:#047857; font-weight:600; padding:11px 13px; }
+  .role-btn.active .ic { background:#059669; color:#fff; border-color:#059669; }
+  .role-btn.active .t small { color:#059669; }
+  .login-box .field { text-align:left; margin-bottom:12px; }
+  .login-box .field label { display:block; font-size:12.5px; font-weight:600; color:#334155; margin-bottom:6px; }
+  .login-box input#pin { width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; text-align:center; font-size:20px; letter-spacing:4px; padding:11px 12px; min-height:48px; }
+  .login-box input#pin:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.18); outline:none; }
+  .login-box .btn-masuk { width:100%; background:#059669; color:#fff; font-weight:700; font-size:15px; border:0; border-radius:8px; padding:12px; cursor:pointer; transition:background .15s, transform .05s; }
+  .login-box .btn-masuk:hover { background:#047857; }
+  .login-box .btn-masuk:active { transform:translateY(1px); background:#065f46; }
+  .login-box .btn-masuk:disabled { background:#6ee7b7; cursor:wait; }
+  .pin-msg { color:var(--danger); font-size:13px; min-height:18px; margin-top:10px; }
+  .login-box .foot { font-size:11.5px; color:#94a3b8; margin-top:14px; }
   .linkbtn { background:none; border:0; color:var(--muted); cursor:pointer; font:inherit; font-size:12px; text-decoration:underline; padding:0 4px; }
   .pill { display:inline-block; background:var(--accent-soft); color:var(--primary); border-radius:999px; padding:3px 10px; font-size:12px; font-weight:600; }
   #rolebadge { display:flex; align-items:center; gap:4px; margin-right:12px; }
-  .sync { font-size:12px; color:var(--muted); }
-  .sync.ok { color:#059669; } .sync.busy { color:#2563eb; } .sync.off { color:#b45309; } .sync.err { color:var(--danger); }
+  .sync { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; border-radius:999px; padding:3px 10px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+  .sync::before { content:"●"; font-size:9px; }
+  .sync.ok { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+  .sync.busy { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+  .sync.off { background:#fff7ed; color:#b45309; border-color:#fed7aa; }
+  .sync.err { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+  .sync:empty { display:none; }
   #msync { display:none; }
-  @media (max-width: 768px) { #msync { display:block; padding:4px 14px; background:#f1f5f9; border-bottom:1px solid var(--line); } #msync:empty { display:none; } }
+  @media (max-width: 768px) { #msync { display:inline-flex; margin:8px 12px 0; } #msync:empty { display:none; } }
 
   /* header atas khusus ponsel */
   #mhead { display:none; }
@@ -324,7 +346,7 @@ async function api(path, opt={}){
   const txt=await r.text(); return txt ? JSON.parse(txt) : null; } // 201/204 tanpa badan = berhasil
 
 /* ---------- masuk / keluar ---------- */
-function pickRole(r){ pendingRole=r; document.querySelectorAll(".role-btn").forEach(b=>b.classList.toggle("active", b.dataset.role===r)); const i=document.getElementById("pin"); if(i){ i.value=""; i.focus(); } }
+function pickRole(r){ pendingRole=r; document.querySelectorAll(".role-btn").forEach(b=>{ const on=b.dataset.role===r; b.classList.toggle("active", on); b.setAttribute("aria-checked", on); }); const i=document.getElementById("pin"); if(i){ i.value=""; i.focus(); } }
 async function login(r){
   const pin=(document.getElementById("pin")?.value||"").trim(); const m=document.getElementById("pin-msg"); const btn=document.getElementById("btn-masuk");
   if(!pin){ m.textContent="Masukkan PIN."; return; }
@@ -352,10 +374,18 @@ async function gantiPin(){
     if(!r.ok) throw 0; alert("PIN "+ROLES[role]+" diperbarui. Berlaku untuk semua perangkat."); }
   catch(e){ alert("Gagal mengubah PIN. Periksa koneksi internet."); }
 }
-function viewLogin(){ return `<div class="login"><div class="login-box"><img src="${LOGO}" alt="Logo Ketahfidhan PTQ"><h1>Monitoring Hafalan Santri</h1><p class="muted small">Pilih peran, lalu masukkan PIN. Masuk membutuhkan internet.</p>
-  <div class="roles">${Object.entries(ROLES).map(([k,v])=>`<button class="role-btn" data-role="${k}" onclick="pickRole('${k}')">${v}</button>`).join("")}</div>
-  <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN" maxlength="12" onkeydown="if(event.key==='Enter') login(pendingRole)">
-  <button id="btn-masuk" class="btn" onclick="login(pendingRole)">Masuk</button><div id="pin-msg" class="pin-msg"></div></div></div>`; }
+const ROLE_DESC={admin:["Bagian ketahfidhan · akses putra & putri","🗂"], Pa:["Pengurus hafalan santri putra","👦"], Pi:["Pengurus hafalan santri putri","👧"]};
+function viewLogin(){ return `<div class="login"><div class="login-box">
+  <div class="logo-frame"><img src="${LOGO}" alt="Logo Ketahfidhan PTQ"></div>
+  <h1>Monitoring Hafalan Santri</h1>
+  <p class="sub">Pilih peran, lalu masukkan PIN untuk masuk.</p>
+  <span id="netstat" class="net${navigator.onLine?"":" off"}">${navigator.onLine?"Online":"Offline · masuk membutuhkan internet"}</span>
+  <div class="roles" role="radiogroup" aria-label="Pilih peran">${Object.entries(ROLES).map(([k,v])=>`<button type="button" class="role-btn" data-role="${k}" role="radio" aria-checked="false" onclick="pickRole('${k}')"><span class="ic">${ROLE_DESC[k][1]}</span><span class="t">${v}<small>${ROLE_DESC[k][0]}</small></span></button>`).join("")}</div>
+  <div class="field"><label for="pin">PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••••" maxlength="12" onkeydown="if(event.key==='Enter') login(pendingRole)"></div>
+  <button id="btn-masuk" class="btn-masuk" onclick="login(pendingRole)">Masuk</button>
+  <div id="pin-msg" class="pin-msg" aria-live="polite"></div>
+  <div class="foot">PTQ Amsa001 · Bagian Ketahfidhan</div>
+</div></div>`; }
 function renderAll(){ const nav=document.querySelector("nav"); const app=document.getElementById("app");
   const mh=document.getElementById("mhead");
   if(!role){ nav.style.display="none"; mh.classList.add("hidden"); app.innerHTML=viewLogin(); pickRole(pendingRole); return; }
@@ -424,6 +454,7 @@ function updateSyncStat(){
 }
 addEventListener("online", ()=>{ syncState="idle"; flush().then(()=>syncPull()); });
 addEventListener("offline", ()=>updateSyncStat());
+["online","offline"].forEach(ev=>addEventListener(ev, ()=>{ const n=document.getElementById("netstat"); if(n){ n.className="net"+(navigator.onLine?"":" off"); n.textContent=navigator.onLine?"Online":"Offline · masuk membutuhkan internet"; } }));
 document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible" && role && Date.now()-lastSync>60000) syncPull(); });
 
 /* ================= STATE & PENYIMPANAN ================= */

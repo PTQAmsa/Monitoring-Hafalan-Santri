@@ -158,13 +158,12 @@
   .login-box .logo-frame img { width:88px; height:88px; object-fit:contain; }
   .login-box h1 { font-size:20px; font-weight:700; color:#0f172a; margin:4px 0 6px; letter-spacing:-.2px; }
   .login-box .sub { font-size:14px; color:#64748b; margin:0 0 18px; line-height:1.5; }
-  .login-box .net { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; border-radius:999px; padding:4px 12px; margin-bottom:16px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; }
-  .login-box .net.off { background:#fff7ed; color:#b45309; border-color:#fed7aa; }
-  .login-box .net::before { content:"●"; font-size:10px; }
   .roles { display:grid; gap:10px; margin:0 0 16px; text-align:left; }
   .role-btn { display:flex; align-items:center; gap:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; cursor:pointer; font:inherit; color:#334155; min-height:52px; transition:all .15s; box-sizing:border-box; }
   .role-btn .ic { width:34px; height:34px; border-radius:10px; background:#fff; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:16px; flex:none; }
-  .role-btn .t { display:flex; flex-direction:column; line-height:1.2; }
+  .role-btn .t { display:flex; flex-direction:column; align-items:flex-start; text-align:left; line-height:1.2; }
+  .role-btn .ic svg { width:20px; height:20px; stroke:#475569; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+  .role-btn.active .ic svg { stroke:#fff; }
   .role-btn .t small { font-size:11.5px; color:#64748b; font-weight:400; margin-top:2px; }
   .role-btn:hover { border-color:#a7f3d0; background:#f0fdf4; }
   .role-btn.active { background:#ecfdf5; border:2px solid #059669; color:#047857; font-weight:600; padding:11px 13px; }
@@ -373,7 +372,7 @@ async function login(r){
     const rr=jwtPayload(j.access_token).app_metadata?.role;
     if(rr!==r) throw new Error(rr ? "Akun ini bukan untuk peran "+ROLES[r]+"." : "Akun belum diberi peran. Hubungi bagian ketahfidhan.");
     setAuth({access_token:j.access_token, refresh_token:j.refresh_token, expires_at:Math.floor(Date.now()/1000)+j.expires_in, role:r}); role=r;
-    const g=visibleGroups(); if(!g.some(x=>x.key===ui.group)) ui.group=g[0].key; ui.lembarGroup="semua"; tab="input";
+    const g=visibleGroups(); if(!g.some(x=>x.key===ui.group)) ui.group=g[0].key; ui.lembarGroup="semua"; tab=isAdmin()?"input":"lembar";
     state=defaultState(); save(); renderAll(); await syncPull();
   }catch(e){
     m.textContent = e.status===400 ? "PIN salah untuk "+ROLES[r]+"." : (e instanceof TypeError ? "Tidak ada koneksi internet. Masuk membutuhkan internet." : e.message);
@@ -391,12 +390,14 @@ async function gantiPin(){
     if(!r.ok) throw 0; alert("PIN "+ROLES[role]+" diperbarui. Berlaku untuk semua perangkat."); }
   catch(e){ alert("Gagal mengubah PIN. Periksa koneksi internet."); }
 }
-const ROLE_DESC={admin:["Bagian ketahfidhan · akses putra & putri","🗂"], Pa:["Pengurus hafalan santri putra","👦"], Pi:["Pengurus hafalan santri putri","👧"]};
+const ICON_ADMIN='<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16h5.5a2.5 2.5 0 0 1 2.5 2z"/><path d="M12 7v12"/></svg>';
+const ICON_PA='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
+const ICON_PI='<svg viewBox="0 0 24 24"><path d="M12 3c-3.5 0-5.5 2.6-5.5 6v2.5c0 2.2-.8 3.3-1.5 4h14c-.7-.7-1.5-1.8-1.5-4V9c0-3.4-2-6-5.5-6z"/><circle cx="12" cy="9.5" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>';
+const ROLE_DESC={admin:["Bagian ketahfidhan · akses putra & putri",ICON_ADMIN], Pa:["Pengurus hafalan santri putra",ICON_PA], Pi:["Pengurus hafalan santri putri",ICON_PI]};
 function viewLogin(){ return `<div class="login"><div class="login-box">
   <div class="logo-frame"><img src="${LOGO}" alt="Logo Ketahfidhan PTQ"></div>
   <h1>Monitoring Hafalan Santri</h1>
   <p class="sub">Pilih peran, lalu masukkan PIN untuk masuk.</p>
-  <span id="netstat" class="net${navigator.onLine?"":" off"}">${navigator.onLine?"Online":"Offline · masuk membutuhkan internet"}</span>
   <div class="roles" role="radiogroup" aria-label="Pilih peran">${Object.entries(ROLES).map(([k,v])=>`<button type="button" class="role-btn" data-role="${k}" role="radio" aria-checked="false" onclick="pickRole('${k}')"><span class="ic">${ROLE_DESC[k][1]}</span><span class="t">${v}<small>${ROLE_DESC[k][0]}</small></span></button>`).join("")}</div>
   <div class="field"><label for="pin">PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••••" maxlength="12" onkeydown="if(event.key==='Enter') login(pendingRole)"></div>
   <button id="btn-masuk" class="btn-masuk" onclick="login(pendingRole)">Masuk</button>
@@ -407,6 +408,8 @@ function renderAll(){ const nav=document.querySelector("nav"); const app=documen
   const mh=document.getElementById("mhead");
   if(!role){ nav.style.display="none"; mh.classList.add("hidden"); app.innerHTML=viewLogin(); pickRole(pendingRole); return; }
   nav.style.display=""; mh.classList.remove("hidden"); document.getElementById("mrole").textContent=ROLES[role];
+  { const bi=nav.querySelector('button[data-tab="input"]'), bl=nav.querySelector('button[data-tab="lembar"]');
+    if(isAdmin()) bi.parentNode.insertBefore(bi, bl); else bl.parentNode.insertBefore(bl, bi); }
   document.getElementById("rolebadge").innerHTML=`<span class="pill">${ROLES[role]}</span> <button class="linkbtn" title="Ambil data terbaru dari server" onclick="syncPull()">↻ Muat ulang</button> <button class="linkbtn" onclick="logout()">Keluar</button>`;
   render(); updateSyncStat(); }
 
@@ -471,7 +474,7 @@ function updateSyncStat(){
 }
 addEventListener("online", ()=>{ syncState="idle"; flush().then(()=>syncPull()); });
 addEventListener("offline", ()=>updateSyncStat());
-["online","offline"].forEach(ev=>addEventListener(ev, ()=>{ const n=document.getElementById("netstat"); if(n){ n.className="net"+(navigator.onLine?"":" off"); n.textContent=navigator.onLine?"Online":"Offline · masuk membutuhkan internet"; } }));
+
 document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible" && role && Date.now()-lastSync>60000) syncPull(); });
 
 /* ================= STATE & PENYIMPANAN ================= */
@@ -657,10 +660,12 @@ function pageFor(g){
 function chartPage(g, ranked){
   const ps=periods(); const P=state.pengaturan; const W=1000,H=440,L=70,R=175,T=20,B=40;
   const withData = ranked.filter(r=>r.total!=null); if(!withData.length) return "";
-  const tjs=[...new Set(ranked.map(r=>targetJuz(r.s)))];
-  let ymin=Math.min(...tjs.map(targetStart)), ymax=Math.max(...tjs.map(t=>targetStart(t)+juzLen(t)));
-  withData.forEach(r=>ps.forEach(p=>{ const v=kacaTotal(entry(r.s.id,p.i)); if(v!=null){ ymin=Math.min(ymin,v); ymax=Math.max(ymax,v);} }));
-  ymin=Math.floor(ymin); ymax=Math.ceil(ymax)+1;
+  // nilai = pertambahan kaca sejak catatan pertama santri itu di semester ini (semua mulai dari 0)
+  const base={}; withData.forEach(r=>{ const fe=firstEntry(r.s.id); base[r.s.id]=fe?kacaTotal(fe.e):0; });
+  const tambah=(sid,pi)=>{ const v=kacaTotal(entry(sid,pi)); return v==null?null:v-base[sid]; };
+  let ymin=0, ymax=8;
+  withData.forEach(r=>ps.forEach(p=>{ const v=tambah(r.s.id,p.i); if(v!=null) ymax=Math.max(ymax,v); }));
+  ymax=Math.ceil(ymax)+1;
   const x=i=>L+(W-L-R)*i/Math.max(1,ps.length-1), y=v=>T+(H-T-B)*(1-(v-ymin)/(ymax-ymin));
   // Palet emerald–teal bertingkat: tetap satu nuansa tema, tapi tiap santri masih bisa dibedakan
   // 12 warna kontras (ramah cetak & buta warna); santri ke-13 dst. memakai warna yang sama dengan garis putus-putus
@@ -674,30 +679,27 @@ function chartPage(g, ranked){
     return d; };
   let svg=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik perkembangan ${esc(g.label)}">`;
   // --- kisi horizontal (putus-putus halus) + label sumbu Y ---
-  const step = (ymax-ymin)>40 ? 10 : 5;
+  const step = (ymax-ymin)>60 ? 10 : (ymax-ymin)>25 ? 5 : (ymax-ymin)>12 ? 2 : 1;
   for(let v=Math.ceil(ymin/step)*step; v<=ymax; v+=step){
     svg+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" class="grid"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" class="axis">${v}</text>`; }
   // --- kisi vertikal tipis per periode + label periode ---
   ps.forEach(p=>{
     svg+=`<line x1="${x(p.i)}" x2="${x(p.i)}" y1="${T}" y2="${H-B}" class="grid"/>`;
     svg+=`<text x="${x(p.i)}" y="${H-B+18}" text-anchor="middle" class="axis axis-strong">P${p.i+1}</text><text x="${x(p.i)}" y="${H-B+31}" text-anchor="middle" class="axis axis-sub">${fmtD(p.date)}</text>`; });
-  // --- garis target (awal & selesai juz) ---
-  tjs.forEach(t=>{ [targetStart(t),targetStart(t)+juzLen(t)].forEach((v,k)=>{
-    svg+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" class="target"/><text x="${L+4}" y="${y(v)-4}" class="target-label">${k?"selesai":"awal"} juz ${t}</text>`; }); });
-  svg+=`<text x="14" y="${(T+H-B)/2}" class="axis" transform="rotate(-90 14 ${(T+H-B)/2})" text-anchor="middle">total kaca hafalan</text>`;
+  svg+=`<text x="14" y="${(T+H-B)/2}" class="axis" transform="rotate(-90 14 ${(T+H-B)/2})" text-anchor="middle">tambahan kaca sejak catatan pertama</text>`;
   // --- garis data per santri: kurva halus + titik putih bertepi emerald ---
   const labelsY=[]; let dots="";
   withData.forEach((r,k)=>{
     const col=PAL[k%PAL.length]; const pts=[]; let last=null;
-    ps.forEach(p=>{ const v=kacaTotal(entry(r.s.id,p.i)); if(v!=null){ pts.push([x(p.i),y(v)]); last={x:x(p.i),y:y(v)}; } });
+    ps.forEach(p=>{ const v=tambah(r.s.id,p.i); if(v!=null){ pts.push([x(p.i),y(v)]); last={x:x(p.i),y:y(v),v}; } });
     const dash=DASH[Math.floor(k/PAL.length)%DASH.length]; if(pts.length>1) svg+=`<path d="${smoothPath(pts)}" class="line" stroke="${col}"${dash?` stroke-dasharray="${dash}"`:""}/>`;
     pts.forEach(p=>dots+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" class="dot" stroke="${col}"/>`);
     if(last){ let ly=last.y; while(labelsY.some(v=>Math.abs(v-ly)<11)) ly+=11; labelsY.push(ly);
-      svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${ly}" y2="${ly}" stroke="${col}" stroke-width="2.5"${dash?` stroke-dasharray="${dash}"`:""}/><text x="${W-R+27}" y="${ly+4}" class="series-label" fill="${col}">${k+1}. ${esc(r.s.nama.split(" ").slice(0,2).join(" "))}</text>`; }
+      svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${ly}" y2="${ly}" stroke="${col}" stroke-width="2.5"${dash?` stroke-dasharray="${dash}"`:""}/><text x="${W-R+27}" y="${ly+4}" class="series-label" fill="${col}">${k+1}. ${esc(r.s.nama.split(" ").slice(0,2).join(" "))} (+${fmtN(last.v)})</text>`; }
   });
   svg+=dots+`</svg>`; // titik digambar paling akhir agar selalu di atas garis
   return `<div class="page"><div class="ph"><div class="left"><img class="plogo" src="${LOGO}" alt=""><div><div class="t1">${esc(P.namaPesantren)}</div><div class="t2">Grafik Perkembangan · ${g.label}</div><div class="t3">${esc(P.semester)}</div></div></div></div>${svg}
-    <div class="pf"><div>Garis putus-putus: batas awal dan akhir juz target kelas.</div><div>Dicetak ${fmtDL(new Date())}</div></div></div>`;
+    <div class="pf"><div>Grafik menunjukkan pertambahan hafalan (kaca) sejak catatan pertama semester ini, sehingga laju tiap santri sebanding walau posisi hafalannya berbeda. Posisi hafalan lengkap ada di tabel. Nomor = urutan hafalan terbanyak.</div><div>Dicetak ${fmtDL(new Date())}</div></div></div>`;
 }
 
 /* ---------- Tab Santri ---------- */
@@ -738,7 +740,6 @@ function viewAtur(){
     ${isAdmin()?`<p class="small muted">Lupa PIN marhalah: atur ulang sandi akun <code>putra@ptqamsa.id</code> atau <code>putri@ptqamsa.id</code> di dasbor Supabase, menu Authentication → Users.</p>`:""}
   </div>`;
   const kartuEkspor = `<div class="card"><h2>Unduh salinan data</h2>
-    <p class="small muted">Untuk arsip atau diolah di Excel. Data utama tetap di server, jadi ini tidak wajib dilakukan.</p>
     <div class="toolbar">
       <button class="btn secondary" onclick="exportCSV()">Ekspor tabel (CSV untuk Excel)</button>
       <button class="btn secondary" onclick="exportJSON()">Ekspor cadangan (JSON)</button>

@@ -640,7 +640,7 @@ function pageFor(g){
     <div class="ph"><div class="left"><img class="plogo" src="${LOGO}" alt=""><div><div class="t1">${esc(P.namaPesantren)}</div><div class="t2">Perkembangan Hafalan Ziyadah · ${g.label}${parts>1?` <span class="part">(${part} dari ${parts})</span>`:""}</div><div class="t3">${esc(P.semester)} · pencatatan setiap ${P.interval} hari · urutan dari hafalan terbanyak</div></div></div>
       <div class="right">Target kelas: Juz ${targetTxt}<br>Jumlah santri: ${ranked.length}</div></div>
     <table class="sheet"><thead>${head}</thead><tbody>${rowsHtml}</tbody></table>
-    <div class="pf"><div class="legend">Capaian juz target: 0% ${tahap} 100% &nbsp;·&nbsp; Total kaca dihitung urut juz 30, 1, 2, dst. (kelas 1: perkiraan dari ayat)</div><div>Dicetak ${fmtDL(new Date())}</div></div>
+    <div class="pf"><div class="legend">Capaian juz target: 0% ${tahap} 100%</div><div>Dicetak ${fmtDL(new Date())}</div></div>
   </div>`;
 
   // --- Pemisahan halaman otomatis: ukur tinggi baris sungguhan, pecah bila melebihi area cetak A4 ---

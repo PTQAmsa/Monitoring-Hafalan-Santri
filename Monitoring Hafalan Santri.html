@@ -516,7 +516,7 @@ function progress(e, tj){ const t=kacaTotal(e); if(t==null) return null; return 
 function labelEntry(e, html=true){
   if(!e) return "";
   if(e.mode==="surat"){ const s=SURAH.find(x=>x[0]===+e.surat); if(!s||!e.ayat) return ""; return html? `<span class="sn">${s[1]}</span>ayat ${e.ayat}` : `${s[1]} ayat ${e.ayat}`; }
-  if(!e.juz||!e.kaca) return ""; return `J${e.juz} K${e.kaca}`;
+  if(!e.juz||!e.kaca) return ""; return html? `<span class="sn">Juz ${e.juz}</span>Kaca ${e.kaca}` : `Juz ${e.juz} Kaca ${e.kaca}`;
 }
 function cellColor(p){
   // Heatmap setoran: p = capaian terhadap juz target (0..1, bisa >1 bila melampaui)

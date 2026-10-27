@@ -335,7 +335,10 @@ const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemS
 const SB_URL="https://rluehsoizefwjdcopukq.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsdWVoc29pemVmd2pkY29wdWtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwNzI0MTQsImV4cCI6MjEwODY0ODQxNH0.X1eKJHqz7k2ls7kPa13h2lTe48RIr6AErAEYj9HMbP4"; // kunci publik (anon); akses data dijaga oleh Row Level Security di server
 const ROLES={admin:"Ketahfidhan", Pa:"Marhalah Putra", Pi:"Marhalah Putri"};
-const ROLE_EMAIL={admin:"ketahfidhan@ptqamsa.id", Pa:"putra@ptqamsa.id", Pi:"putri@ptqamsa.id"}; // akun di Supabase Auth
+const ROLE_EMAIL={admin:"ketahfidhan@ptqamsa.id", Pa:"putra@ptqamsa.id", Pi:"putri@ptqamsa.id"}; // akun penulis di Supabase Auth
+const ROLE_EMAIL_R={admin:"lihat.ketahfidhan@ptqamsa.id", Pa:"lihat.putra@ptqamsa.id", Pi:"lihat.putri@ptqamsa.id"}; // akun pembaca (lihat saja)
+let readOnly = !!(auth && auth.readOnly);
+const roleLabel = () => ROLES[role] + (readOnly ? " · lihat saja" : "");
 const AUTHKEY="monitoringHafalan.auth", OUTKEY="monitoringHafalan.outbox";
 let auth=null; try{ auth=JSON.parse(localStorage.getItem(AUTHKEY)); }catch(e){}
 let role = auth?.role || null; if(role && !ROLES[role]){ role=null; auth=null; }
@@ -368,20 +371,22 @@ async function login(r){
   if(!pin){ m.textContent="Masukkan PIN."; return; }
   btn.disabled=true; btn.textContent="Memeriksa…"; m.textContent="";
   try{
-    const j=await sbAuth("token?grant_type=password",{email:ROLE_EMAIL[r], password:pin});
+    let j, ro=false;
+    try{ j=await sbAuth("token?grant_type=password",{email:ROLE_EMAIL[r], password:pin}); }
+    catch(e1){ if(e1.status!==400) throw e1; j=await sbAuth("token?grant_type=password",{email:ROLE_EMAIL_R[r], password:pin}); ro=true; }
     const rr=jwtPayload(j.access_token).app_metadata?.role;
-    if(rr!==r) throw new Error(rr ? "Akun ini bukan untuk peran "+ROLES[r]+"." : "Akun belum diberi peran. Hubungi bagian ketahfidhan.");
-    setAuth({access_token:j.access_token, refresh_token:j.refresh_token, expires_at:Math.floor(Date.now()/1000)+j.expires_in, role:r}); role=r;
-    const g=visibleGroups(); if(!g.some(x=>x.key===ui.group)) ui.group=g[0].key; ui.lembarGroup="semua"; tab=isAdmin()?"input":"lembar";
+    if(rr!==(ro?r+"_r":r)) throw new Error(rr ? "Akun ini bukan untuk peran "+ROLES[r]+"." : "Akun belum diberi peran. Hubungi bagian ketahfidhan.");
+    setAuth({access_token:j.access_token, refresh_token:j.refresh_token, expires_at:Math.floor(Date.now()/1000)+j.expires_in, role:r, readOnly:ro}); role=r; readOnly=ro;
+    const g=visibleGroups(); if(!g.some(x=>x.key===ui.group)) ui.group=g[0].key; ui.lembarGroup="semua"; tab=(isAdmin()&&!readOnly)?"input":"lembar";
     state=defaultState(); save(); renderAll(); await syncPull();
   }catch(e){
     m.textContent = e.status===400 ? "PIN salah untuk "+ROLES[r]+"." : (e instanceof TypeError ? "Tidak ada koneksi internet. Masuk membutuhkan internet." : e.message);
   }finally{ btn.disabled=false; btn.textContent="Masuk"; }
 }
 function logout(){
-  const n=outbox.length; if(!confirm("Keluar dari peran "+ROLES[role]+"?"+(n?` Ada ${n} perubahan yang belum terkirim ke server dan akan hilang.`:""))) return;
+  const n=outbox.length; if(!confirm("Keluar dari peran "+roleLabel()+"?"+(n?` Ada ${n} perubahan yang belum terkirim ke server dan akan hilang.`:""))) return;
   forceLogout(); }
-function forceLogout(){ setAuth(null); role=null; outbox=[]; saveOutbox(); state=defaultState(); save(); renderAll(); }
+function forceLogout(){ setAuth(null); role=null; readOnly=false; outbox=[]; saveOutbox(); state=defaultState(); save(); renderAll(); }
 async function gantiPin(){
   const cur=prompt("Masukkan PIN "+ROLES[role]+" saat ini:"); if(cur==null) return;
   try{ await sbAuth("token?grant_type=password",{email:ROLE_EMAIL[role], password:cur.trim()}); }catch(e){ alert(e instanceof TypeError ? "Tidak ada koneksi internet." : "PIN salah."); return; }
@@ -407,10 +412,12 @@ function viewLogin(){ return `<div class="login"><div class="login-box">
 function renderAll(){ const nav=document.querySelector("nav"); const app=document.getElementById("app");
   const mh=document.getElementById("mhead");
   if(!role){ nav.style.display="none"; mh.classList.add("hidden"); app.innerHTML=viewLogin(); pickRole(pendingRole); return; }
-  nav.style.display=""; mh.classList.remove("hidden"); document.getElementById("mrole").textContent=ROLES[role];
-  { const bi=nav.querySelector('button[data-tab="input"]'), bl=nav.querySelector('button[data-tab="lembar"]');
-    if(isAdmin()) bi.parentNode.insertBefore(bi, bl); else bl.parentNode.insertBefore(bl, bi); }
-  document.getElementById("rolebadge").innerHTML=`<span class="pill">${ROLES[role]}</span> <button class="linkbtn" title="Ambil data terbaru dari server" onclick="syncPull()">↻ Muat ulang</button> <button class="linkbtn" onclick="logout()">Keluar</button>`;
+  nav.style.display=""; mh.classList.remove("hidden"); document.getElementById("mrole").textContent=roleLabel();
+  { const bi=nav.querySelector('button[data-tab="input"]'), bl=nav.querySelector('button[data-tab="lembar"]'), bs=nav.querySelector('button[data-tab="santri"]');
+    if(isAdmin()) bi.parentNode.insertBefore(bi, bl); else bl.parentNode.insertBefore(bl, bi);
+    bi.style.display = readOnly ? "none" : ""; bs.style.display = readOnly ? "none" : "";
+    if(readOnly && (tab==="input"||tab==="santri")) tab="lembar"; }
+  document.getElementById("rolebadge").innerHTML=`<span class="pill">${roleLabel()}</span> <button class="linkbtn" title="Ambil data terbaru dari server" onclick="syncPull()">↻ Muat ulang</button> <button class="linkbtn" onclick="logout()">Keluar</button>`;
   render(); updateSyncStat(); }
 
 /* ---------- antrean perubahan (outbox) & sinkronisasi ---------- */
@@ -418,6 +425,7 @@ let outbox=[]; try{ outbox=JSON.parse(localStorage.getItem(OUTKEY))||[]; }catch(
 let syncState="idle", lastSync=0, flushing=false, flushTimer=null;
 function saveOutbox(){ localStorage.setItem(OUTKEY, JSON.stringify(outbox)); }
 function queue(op){ // op: {t:"setoran"|"santri"|"pengaturan"|"setoran_semua", k:kunci, a:"upsert"|"delete", row}
+  if(readOnly) return;
   const i=outbox.findIndex(o=>o.t===op.t && o.k===op.k && o.a===op.a); if(i>=0) outbox.splice(i,1); outbox.push(op); saveOutbox(); scheduleFlush(); }
 function scheduleFlush(ms=700){ clearTimeout(flushTimer); flushTimer=setTimeout(flush, ms); updateSyncStat(); }
 async function sendOp(op){
@@ -539,6 +547,7 @@ const fmtN = n => (Math.round(n*10)/10).toLocaleString("id-ID");
 function render(){
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
   const app=document.getElementById("app");
+  if(readOnly && (tab==="input"||tab==="santri")) tab="lembar";
   if(tab==="input") app.innerHTML=viewInput();
   else if(tab==="lembar") app.innerHTML=viewLembar();
   else if(tab==="santri") app.innerHTML=viewSantri();
@@ -731,20 +740,20 @@ function delS(id){ const s=state.santri.find(x=>x.id===id); if(!s||!canSee(s)) r
 function viewAtur(){
   const P=state.pengaturan;
   const kartuAkun = `<div class="card"><h2>Akun &amp; sinkronisasi</h2>
-    <p class="small muted">Peran aktif: <b>${ROLES[role]}</b>. ${isAdmin()?"Ketahfidhan melihat dan mengelola data putra dan putri.":"Antum hanya melihat dan mengelola data marhalah "+(role==="Pa"?"putra":"putri")+"."} Data tersimpan di server bersama, sehingga semua perangkat melihat data yang sama. Perubahan yang dibuat saat tidak ada sinyal dikirim otomatis begitu internet kembali.</p>
+    <p class="small muted">Peran aktif: <b>${roleLabel()}</b>. ${readOnly ? "Akun ini hanya dapat melihat, mencetak, dan mengunduh data"+(isAdmin()?" putra dan putri":" marhalah "+(role==="Pa"?"putra":"putri"))+". Mengubah data tidak dimungkinkan." : (isAdmin()?"Ketahfidhan melihat dan mengelola data putra dan putri.":"Antum hanya melihat dan mengelola data marhalah "+(role==="Pa"?"putra":"putri")+".")+" Data tersimpan di server bersama, sehingga semua perangkat melihat data yang sama. Perubahan yang dibuat saat tidak ada sinyal dikirim otomatis begitu internet kembali."}</p>
     <p class="small" id="sync-info"></p>
     <div class="toolbar">
       <button class="btn secondary" onclick="syncPull()">↻ Muat ulang dari server</button>
-      <button class="btn secondary" onclick="gantiPin()">Ganti PIN ${isAdmin()?"Ketahfidhan":"saya"}</button>
+      ${readOnly?"":`<button class="btn secondary" onclick="gantiPin()">Ganti PIN ${isAdmin()?"Ketahfidhan":"saya"}</button>`}
       <button class="btn danger" onclick="logout()">Keluar</button></div>
-    ${isAdmin()?`<p class="small muted">Lupa PIN marhalah: atur ulang sandi akun <code>putra@ptqamsa.id</code> atau <code>putri@ptqamsa.id</code> di dasbor Supabase, menu Authentication → Users.</p>`:""}
+    ${isAdmin()&&!readOnly?`<p class="small muted">Lupa PIN: atur ulang sandi akun di dasbor Supabase, menu Authentication → Users. Akun penulis: <code>putra@</code>, <code>putri@</code>; akun pembaca (lihat saja): <code>lihat.ketahfidhan@</code>, <code>lihat.putra@</code>, <code>lihat.putri@ptqamsa.id</code>.</p>`:""}
   </div>`;
   const kartuEkspor = `<div class="card"><h2>Unduh salinan data</h2>
     <div class="toolbar">
       <button class="btn secondary" onclick="exportCSV()">Ekspor tabel (CSV untuk Excel)</button>
       <button class="btn secondary" onclick="exportJSON()">Ekspor cadangan (JSON)</button>
     </div></div>`;
-  if(!isAdmin()) return kartuAkun + kartuEkspor;
+  if(!isAdmin() || readOnly) return kartuAkun + kartuEkspor;
   return kartuAkun + `<div class="card"><h2>Pengaturan semester</h2>
     <table class="grid" style="max-width:720px">
       <tr><td>Nama pesantren / bagian</td><td><input style="width:100%" value="${esc(P.namaPesantren)}" oninput="setP('namaPesantren',this.value)"></td></tr>

@@ -337,11 +337,11 @@ const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const ROLES={admin:"Ketahfidhan", Pa:"Marhalah Putra", Pi:"Marhalah Putri"};
 const ROLE_EMAIL={admin:"ketahfidhan@ptqamsa.id", Pa:"putra@ptqamsa.id", Pi:"putri@ptqamsa.id"}; // akun penulis di Supabase Auth
 const ROLE_EMAIL_R={admin:"lihat.ketahfidhan@ptqamsa.id", Pa:"lihat.putra@ptqamsa.id", Pi:"lihat.putri@ptqamsa.id"}; // akun pembaca (lihat saja)
-let readOnly = !!(auth && auth.readOnly);
-const roleLabel = () => ROLES[role] + (readOnly ? " · lihat saja" : "");
 const AUTHKEY="monitoringHafalan.auth", OUTKEY="monitoringHafalan.outbox";
 let auth=null; try{ auth=JSON.parse(localStorage.getItem(AUTHKEY)); }catch(e){}
 let role = auth?.role || null; if(role && !ROLES[role]){ role=null; auth=null; }
+let readOnly = !!(auth && auth.readOnly);
+const roleLabel = () => ROLES[role] + (readOnly ? " · lihat saja" : "");
 let pendingRole="admin";
 const isAdmin = () => role==="admin";
 const canSee = s => isAdmin() || s.pp===role;                 // santri yang boleh dilihat peran aktif

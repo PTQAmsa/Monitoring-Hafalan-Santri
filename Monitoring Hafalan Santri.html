@@ -290,7 +290,7 @@ const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemS
 
 /* ================= PERAN & PIN ================= */
 const ROLES={admin:"Ketahfidhan", Pa:"Marhalah Putra", Pi:"Marhalah Putri"};
-const PIN_DEFAULT={admin:"1357", Pa:"1111", Pi:"2222"}; // PIN awal — segera ganti lewat tab Pengaturan
+const PIN_DEFAULT={admin:"1357", Pa:"1133", Pi:"1168"}; // PIN awal — segera ganti lewat tab Pengaturan
 function hashPin(p){ let h1=0xdeadbeef, h2=0x41c6ce57; const s="ptq-ketahfidhan:"+String(p); for(let i=0;i<s.length;i++){ const c=s.charCodeAt(i); h1=Math.imul(h1^c,2654435761); h2=Math.imul(h2^c,1597334677); }
   h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
   return (h2>>>0).toString(16).padStart(8,"0")+(h1>>>0).toString(16).padStart(8,"0"); }

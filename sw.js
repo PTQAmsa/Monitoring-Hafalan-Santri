@@ -1,7 +1,7 @@
 /* Service worker: menyimpan aplikasi di HP agar bisa dibuka tanpa internet
    setelah pemasangan pertama. Naikkan VERSI setiap kali file HTML diperbarui
    supaya HP para guru mengambil versi terbaru saat online. */
-const VERSI = "hafalan-v2";
+const VERSI = "hafalan-v3";
 const BERKAS = [
   "./Monitoring%20Hafalan%20Santri.html",
   "./manifest.webmanifest",
@@ -20,6 +20,7 @@ self.addEventListener("activate", e => {
 /* Strategi: coba jaringan dulu (agar pembaruan cepat terambil), kalau gagal pakai salinan tersimpan. */
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  if (new URL(e.request.url).origin !== self.location.origin) return; // data Supabase tidak pernah di-cache
   e.respondWith(
     fetch(e.request).then(r => { const copy = r.clone(); caches.open(VERSI).then(c => c.put(e.request, copy)); return r; })
       .catch(() => caches.match(e.request, { ignoreSearch: true }))

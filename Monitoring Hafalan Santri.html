@@ -150,7 +150,6 @@
   svg.chart .line { fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
   svg.chart .dot { fill:#ffffff; stroke-width:2; }
   svg.chart .series-label { font-size:10.5px; font-weight:600; }
-  svg.chart .series-sub { font-size:9px; font-weight:500; }
 
   /* ---------- Layar masuk (peran + PIN) ---------- */
   .login { min-height:calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding:24px 12px; background:#f8fafc; }
@@ -677,10 +676,10 @@ function pageFor(g){
 }
 
 function chartPage(g, ranked){
-  const ps=periods(); const P=state.pengaturan; const W=1000,H=440,L=70,R=265,T=20,B=40;
+  const ps=periods(); const P=state.pengaturan; const W=1000,H=440,L=70,R=175,T=20,B=40;
   const withData = ranked.filter(r=>r.total!=null); if(!withData.length) return "";
   // nilai = pertambahan kaca sejak catatan pertama santri itu di semester ini (semua mulai dari 0)
-  const base={}, awal={}; withData.forEach(r=>{ const fe=firstEntry(r.s.id); base[r.s.id]=fe?kacaTotal(fe.e):0; awal[r.s.id]=fe?labelEntry(fe.e,false):""; });
+  const base={}; withData.forEach(r=>{ const fe=firstEntry(r.s.id); base[r.s.id]=fe?kacaTotal(fe.e):0; });
   const tambah=(sid,pi)=>{ const v=kacaTotal(entry(sid,pi)); return v==null?null:v-base[sid]; };
   let ymin=0, ymax=8;
   withData.forEach(r=>ps.forEach(p=>{ const v=tambah(r.s.id,p.i); if(v!=null) ymax=Math.max(ymax,v); }));
@@ -714,11 +713,11 @@ function chartPage(g, ranked){
     const dash=DASH[Math.floor(k/PAL.length)%DASH.length]; if(pts.length>1) svg+=`<path d="${smoothPath(pts)}" class="line" stroke="${col}"${dash?` stroke-dasharray="${dash}"`:""}/>`;
     pts.forEach(p=>dots+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" class="dot" stroke="${col}"/>`);
     if(last){ let ly=last.y; while(labelsY.some(v=>Math.abs(v-ly)<11)) ly+=11; labelsY.push(ly);
-      svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${ly}" y2="${ly}" stroke="${col}" stroke-width="2.5"${dash?` stroke-dasharray="${dash}"`:""}/><text x="${W-R+27}" y="${ly+4}" class="series-label" fill="${col}">${k+1}. ${esc(r.s.nama.split(" ").slice(0,2).join(" "))} <tspan class="series-sub">(${esc(awal[r.s.id]||"—")}, +${fmtN(last.v)})</tspan></text>`; }
+      svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${ly}" y2="${ly}" stroke="${col}" stroke-width="2.5"${dash?` stroke-dasharray="${dash}"`:""}/><text x="${W-R+27}" y="${ly+4}" class="series-label" fill="${col}">${k+1}. ${esc(r.s.nama.split(" ").slice(0,2).join(" "))} (+${fmtN(last.v)})</text>`; }
   });
   svg+=dots+`</svg>`; // titik digambar paling akhir agar selalu di atas garis
   return `<div class="page"><div class="ph"><div class="left"><img class="plogo" src="${LOGO}" alt=""><div><div class="t1">${esc(P.namaPesantren)}</div><div class="t2">Grafik Perkembangan · ${g.label}</div><div class="t3">${esc(P.semester)}</div></div></div></div>${svg}
-    <div class="pf"><div>Grafik menunjukkan pertambahan hafalan (kaca) sejak catatan pertama semester ini, sehingga laju tiap santri sebanding walau posisi hafalannya berbeda. Keterangan di kanan: posisi awal (catatan pertama) dan jumlah tambahan. Posisi hafalan lengkap ada di tabel. Nomor = urutan hafalan terbanyak.</div><div>Dicetak ${fmtDL(new Date())}</div></div></div>`;
+    <div class="pf"><div>Grafik menunjukkan pertambahan hafalan (kaca) sejak catatan pertama semester ini, sehingga laju tiap santri sebanding walau posisi hafalannya berbeda. Posisi hafalan lengkap ada di tabel. Nomor = urutan hafalan terbanyak.</div><div>Dicetak ${fmtDL(new Date())}</div></div></div>`;
 }
 
 /* ---------- Tab Santri ---------- */

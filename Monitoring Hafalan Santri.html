@@ -676,14 +676,14 @@ function pageFor(g){
 }
 
 function chartPage(g, ranked){
-  const ps=periods(); const P=state.pengaturan; const W=1000,H=440,L=70,R=175,T=20,B=40;
+  const ps=periods(); const P=state.pengaturan; const W=1000,H=440,L=70,R=215,T=20,B=40;
   const withData = ranked.filter(r=>r.total!=null); if(!withData.length) return "";
   // nilai = pertambahan kaca sejak catatan pertama santri itu di semester ini (semua mulai dari 0)
   const base={}; withData.forEach(r=>{ const fe=firstEntry(r.s.id); base[r.s.id]=fe?kacaTotal(fe.e):0; });
   const tambah=(sid,pi)=>{ const v=kacaTotal(entry(sid,pi)); return v==null?null:v-base[sid]; };
   let ymin=0, ymax=8;
-  withData.forEach(r=>ps.forEach(p=>{ const v=tambah(r.s.id,p.i); if(v!=null) ymax=Math.max(ymax,v); }));
-  ymax=Math.ceil(ymax)+1;
+  withData.forEach(r=>ps.forEach(p=>{ const v=tambah(r.s.id,p.i); if(v!=null){ ymax=Math.max(ymax,v); ymin=Math.min(ymin,v); } }));
+  ymax=Math.ceil(ymax)+1; ymin=Math.floor(ymin);
   const x=i=>L+(W-L-R)*i/Math.max(1,ps.length-1), y=v=>T+(H-T-B)*(1-(v-ymin)/(ymax-ymin));
   // Palet emerald–teal bertingkat: tetap satu nuansa tema, tapi tiap santri masih bisa dibedakan
   // 12 warna kontras (ramah cetak & buta warna); santri ke-13 dst. memakai warna yang sama dengan garis putus-putus
@@ -706,15 +706,21 @@ function chartPage(g, ranked){
     svg+=`<text x="${x(p.i)}" y="${H-B+18}" text-anchor="middle" class="axis axis-strong">P${p.i+1}</text><text x="${x(p.i)}" y="${H-B+31}" text-anchor="middle" class="axis axis-sub">${fmtD(p.date)}</text>`; });
   svg+=`<text x="14" y="${(T+H-B)/2}" class="axis" transform="rotate(-90 14 ${(T+H-B)/2})" text-anchor="middle">tambahan kaca sejak catatan pertama</text>`;
   // --- garis data per santri: kurva halus + titik putih bertepi emerald ---
-  const labelsY=[]; let dots="";
+  const labels=[]; let dots="";
   withData.forEach((r,k)=>{
     const col=PAL[k%PAL.length]; const pts=[]; let last=null;
     ps.forEach(p=>{ const v=tambah(r.s.id,p.i); if(v!=null){ pts.push([x(p.i),y(v)]); last={x:x(p.i),y:y(v),v}; } });
     const dash=DASH[Math.floor(k/PAL.length)%DASH.length]; if(pts.length>1) svg+=`<path d="${smoothPath(pts)}" class="line" stroke="${col}"${dash?` stroke-dasharray="${dash}"`:""}/>`;
     pts.forEach(p=>dots+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" class="dot" stroke="${col}"/>`);
-    if(last){ let ly=last.y; while(labelsY.some(v=>Math.abs(v-ly)<11)) ly+=11; labelsY.push(ly);
-      svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${ly}" y2="${ly}" stroke="${col}" stroke-width="2.5"${dash?` stroke-dasharray="${dash}"`:""}/><text x="${W-R+27}" y="${ly+4}" class="series-label" fill="${col}">${k+1}. ${esc(r.s.nama.split(" ").slice(0,2).join(" "))} (+${fmtN(last.v)})</text>`; }
+    if(last) labels.push({y:last.y, col, dash, txt:`${k+1}. ${esc(r.s.nama.split(" ").slice(0,2).join(" "))} (${last.v<0?"":"+"}${fmtN(last.v)})`});
   });
+  // susun label: urut dari atas, jarak minimal GAP, lalu geser agar seluruh blok tetap di dalam bidang grafik
+  const top=T+6, bot=H-B-4, GAP=Math.min(11, labels.length?(bot-top)/labels.length:11), fsz=GAP<11?Math.max(8,GAP-1):10.5;
+  labels.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<labels.length;i++){ if(labels[i].y-labels[i-1].y<GAP) labels[i].y=labels[i-1].y+GAP; }
+  if(labels.length){ const over=labels[labels.length-1].y-bot; if(over>0) labels.forEach(l=>l.y-=over);
+    for(let i=0;i<labels.length;i++){ const lo=i===0?top:labels[i-1].y+GAP; if(labels[i].y<lo) labels[i].y=lo; } }
+  labels.forEach(l=>{ svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${l.y.toFixed(1)}" y2="${l.y.toFixed(1)}" stroke="${l.col}" stroke-width="2.5"${l.dash?` stroke-dasharray="${l.dash}"`:""}/><text x="${W-R+27}" y="${(l.y+4).toFixed(1)}" class="series-label" style="font-size:${fsz}px" fill="${l.col}">${l.txt}</text>`; });
   svg+=dots+`</svg>`; // titik digambar paling akhir agar selalu di atas garis
   return `<div class="page"><div class="ph"><div class="left"><img class="plogo" src="${LOGO}" alt=""><div><div class="t1">${esc(P.namaPesantren)}</div><div class="t2">Grafik Perkembangan · ${g.label}</div><div class="t3">${esc(P.semester)}</div></div></div></div>${svg}
     <div class="pf"><div>Grafik menunjukkan pertambahan hafalan (kaca) sejak catatan pertama semester ini, sehingga laju tiap santri sebanding walau posisi hafalannya berbeda. Posisi hafalan lengkap ada di tabel. Nomor = urutan hafalan terbanyak.</div><div>Dicetak ${fmtDL(new Date())}</div></div></div>`;

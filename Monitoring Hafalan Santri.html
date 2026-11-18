@@ -407,13 +407,15 @@
     .stat:nth-child(n+4) { border-top:1px solid var(--line-soft); }
     .grp-row { grid-template-columns:minmax(160px,1.6fr) repeat(4,minmax(70px,1fr)) auto; }
     .grp-row .fl-col { display:none; }
+    table.rk .c-tren { display:none; }
+    .pbar { min-width:120px; }
+  }
+  @media (max-width: 1100px) and (min-width: 769px) {
     /* menu lebih ringkas: "Muat ulang" tetap ada di Pengaturan, status sinkron dipendekkan */
     #rolebadge .linkbtn[title] { display:none; }
     #savestat.sync { display:inline-block; max-width:190px; overflow:hidden; text-overflow:ellipsis; vertical-align:middle; }
     #savestat.sync::before { display:inline-block; margin-right:6px; vertical-align:1px; }
     #savestat.sync:empty { display:none; }
-    table.rk .c-tren { display:none; }
-    .pbar { min-width:120px; }
   }
   @media (max-width: 1400px) and (min-width: 769px) {
     nav button .lf { display:none; } nav button .ls { display:inline; }

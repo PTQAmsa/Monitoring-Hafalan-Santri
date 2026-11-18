@@ -7,269 +7,535 @@
 <link id="favicon" rel="icon" type="image/png" href="">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#1E5B3F">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hafalan Santri PTQ">
 <style>
   /* =====================================================
-     TEMA EMERALD & SLATE — Vanilla CSS, tanpa framework
+     MODERN MUSHAF — token desain (Vanilla CSS, tanpa framework)
+     Forest = aksi, navigasi aktif, kemajuan
+     Navy   = tipografi, identitas kedua, isi analitis
+     Ivory  = latar halaman · Putih = permukaan isi
+     Sage   = permukaan kedua & penanda lembut
+     Gold   = penanda capaian & hiasan tipis (tidak untuk teks biasa)
      ===================================================== */
   :root {
-    --bg:#f8fafc;            /* latar utama (slate soft) */
-    --card:#ffffff;          /* kartu / container */
-    --line:#e2e8f0;          /* border kartu & tabel */
-    --line-strong:#cbd5e1;   /* border input */
-    --ink:#1e293b;           /* teks utama (slate gelap) */
-    --muted:#64748b;         /* teks sekunder */
-    --subtle:#94a3b8;        /* ikon / teks sangat ringan */
-    --primary:#0f766e;       /* teal/emerald tua: header, tab aktif */
-    --accent:#059669;        /* emerald: tombol, fokus, aksen */
-    --accent-soft:#ecfdf5;   /* latar emerald sangat muda */
-    --accent-ring:rgba(5,150,105,.18);
-    --danger:#ef4444;
-    --zebra:#f8fafc;
-    --hover:#f1f5f9;
-    --radius:8px;
-    --shadow:0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
-    --shadow-md:0 4px 12px rgba(15,23,42,.08);
+    /* palet inti */
+    --forest:#1E5B3F; --forest-600:#2F7A55; --forest-100:#DCE9DF; --forest-50:#EEF4EF;
+    --navy:#1B2A41;   --navy-600:#4A5A73;   --navy-400:#66758C;   --navy-50:#EEF1F6;
+    --ivory:#FAF7F0;  --surface:#FFFFFF;    --sage:#E6EEE4;       --sage-300:#C9D8C5;
+    --gold:#B8913A;   --gold-text:#8A6A1F;  --gold-50:#F7F0DF;
+    --danger:#B42318; --danger-50:#FDF0EE;  --danger-200:#F2C4BD;
+    --amber:#8A5300;  --amber-50:#FDF4E3;   --amber-200:#EED6A8;
+
+    /* peran semantik (nama lama dipertahankan agar gaya lama tetap terbaca) */
+    --bg:var(--ivory); --card:var(--surface);
+    --line:#E6E1D6; --line-strong:#D3CCBE; --line-soft:#EFEBE3;
+    --ink:var(--navy); --muted:var(--navy-600); --subtle:var(--navy-400); /* --subtle hanya di atas putih */
+    --primary:var(--forest); --accent:var(--forest); --accent-soft:var(--forest-50);
+    --accent-ring:rgba(30,91,63,.22);
+    --hover:#F5F2EA; --zebra:#FCFBF7;
+
+    /* tipografi: judul serif klasik, isi sans sistem — semua dari perangkat, tanpa unduhan */
+    --sans:"Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+    --serif:"Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+
+    /* bentuk */
+    --radius:10px; --radius-sm:6px;
+    --shadow:0 1px 2px rgba(27,42,65,.04);
+    --shadow-md:0 6px 18px rgba(27,42,65,.08);
+    --stick-top:57px;  /* tinggi menu atas desktop: patokan elemen lengket */
+
+    /* lembar cetak A4: warna sendiri, latar putih, hemat tinta */
+    --sheet-ink:#1B2A41; --sheet-muted:#4A5A73; --sheet-brand:#1E5B3F;
+    --sheet-line:#C9D0C6; --sheet-line-soft:#E1E6DE; --sheet-head:#EEF2EC; --sheet-zebra:#FAFBF8;
   }
   * { box-sizing:border-box; }
   html { -webkit-text-size-adjust:100%; }
-  body { margin:0; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:var(--ink); background:var(--bg); font-size:14px; line-height:1.45; }
+  body { margin:0; font-family:var(--sans); color:var(--ink); background:var(--bg); font-size:14px; line-height:1.5; }
 
-  /* ---------- Navigasi tab (pills) ---------- */
-  nav { display:flex; gap:6px; padding:10px 20px; background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; align-items:center; box-shadow:var(--shadow); }
-  nav .brand { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; margin-right:14px; color:var(--primary); letter-spacing:.1px; }
-  nav .brand img.logo { width:30px; height:30px; object-fit:contain; }
-  nav button { border:1px solid transparent; background:transparent; padding:8px 16px; border-radius:999px; cursor:pointer; font-size:14px; font-weight:500; color:var(--muted); transition:background .15s, color .15s; }
-  nav button:hover { background:var(--hover); color:var(--ink); }
-  nav button.active { background:var(--accent); color:#fff; font-weight:600; box-shadow:0 1px 2px rgba(5,150,105,.35); }
-  nav button:focus-visible { outline:3px solid var(--accent-ring); outline-offset:1px; }
+  /* ---------- Navigasi utama (desktop: garis bawah, gaya editorial) ---------- */
+  nav { display:flex; gap:2px; padding:0 24px; height:var(--stick-top); background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; align-items:stretch; }
+  nav .brand { display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:700; font-size:17px; margin-right:22px; color:var(--navy); letter-spacing:.1px; white-space:nowrap; }
+  nav .brand img.logo { width:32px; height:32px; object-fit:contain; }
+  nav button { position:relative; display:flex; align-items:center; gap:7px; border:0; background:transparent; padding:0 14px; cursor:pointer; font:inherit; font-size:14px; font-weight:500; color:var(--muted); white-space:nowrap; transition:color .15s; }
+  nav button::after { content:""; position:absolute; left:12px; right:12px; bottom:-1px; height:2px; border-radius:2px 2px 0 0; background:transparent; transition:background .15s; }
+  nav button:hover { color:var(--ink); }
+  nav button.active { color:var(--forest); font-weight:600; }
+  nav button.active::after { background:var(--forest); }
+  nav button:focus-visible { outline:3px solid var(--accent-ring); outline-offset:-3px; border-radius:6px; }
+  nav button .ni { display:none; }
+  nav button .ni svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  nav > span:not(.brand) { align-self:center; }
   #savestat { color:var(--subtle); font-size:12px; }
 
-  main { padding:18px 20px 40px; max-width:1400px; margin:0 auto; }
+  main { padding:22px 24px 48px; max-width:1320px; margin:0 auto; }
 
   /* ---------- Baris filter / toolbar ---------- */
-  .toolbar { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-bottom:14px; }
-  main > .toolbar { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; box-shadow:var(--shadow); }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-bottom:16px; }
+  main > .toolbar { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; }
   .toolbar label { display:flex; gap:8px; align-items:center; font-weight:500; color:var(--muted); font-size:13px; }
   .toolbar label select, .toolbar label input { color:var(--ink); font-weight:500; }
 
-  /* ---------- Kartu ---------- */
-  .card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin-bottom:16px; box-shadow:var(--shadow); }
-  h2 { margin:0 0 12px; font-size:16px; font-weight:600; color:var(--primary); letter-spacing:.1px; }
+  /* ---------- Permukaan isi ---------- */
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; margin-bottom:16px; }
+  h2 { margin:0 0 12px; font-family:var(--serif); font-size:18px; font-weight:700; color:var(--navy); letter-spacing:.1px; }
   .muted { color:var(--muted); }
   .small { font-size:12px; }
   .empty { color:var(--muted); padding:36px; text-align:center; }
-  .warn { background:#fffbeb; border:1px solid #fcd34d; color:#78350f; padding:10px 14px; border-radius:var(--radius); margin-bottom:14px; font-size:13px; }
-  .warn b { color:#92400e; }
+  .warn { background:var(--amber-50); border:1px solid var(--amber-200); color:var(--amber); padding:10px 14px; border-radius:var(--radius-sm); margin-bottom:14px; font-size:13px; }
+  .warn b { color:var(--amber); }
   details summary { cursor:pointer; }
   code { background:var(--hover); padding:1px 5px; border-radius:4px; font-size:12px; }
 
   /* ---------- Tombol ---------- */
-  button.btn, label.btn { display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:6px; padding:8px 16px; cursor:pointer; font:inherit; font-size:13px; font-weight:600; line-height:1.2; transition:background .15s, box-shadow .15s, transform .05s; }
-  button.btn:hover, label.btn:hover { background:var(--primary); border-color:var(--primary); }
+  button.btn, label.btn { display:inline-flex; align-items:center; gap:6px; background:var(--forest); color:#fff; border:1px solid var(--forest); border-radius:var(--radius-sm); padding:8px 16px; cursor:pointer; font:inherit; font-size:13px; font-weight:600; line-height:1.2; transition:background .15s, border-color .15s, transform .05s; }
+  button.btn:hover, label.btn:hover { background:#174a33; border-color:#174a33; }
   button.btn:active { transform:translateY(1px); }
-  button.btn.secondary, label.btn.secondary { background:var(--card); color:var(--accent); border-color:var(--accent); }
-  button.btn.secondary:hover, label.btn.secondary:hover { background:var(--accent-soft); color:var(--primary); border-color:var(--primary); }
-  button.btn.danger { background:var(--card); color:var(--danger); border-color:#fca5a5; }
-  button.btn.danger:hover { background:#fef2f2; border-color:var(--danger); }
+  button.btn.secondary, label.btn.secondary { background:var(--surface); color:var(--forest); border-color:var(--sage-300); }
+  button.btn.secondary:hover, label.btn.secondary:hover { background:var(--forest-50); color:var(--forest); border-color:var(--forest); }
+  button.btn.danger { background:var(--surface); color:var(--danger); border-color:var(--danger-200); }
+  button.btn.danger:hover { background:var(--danger-50); border-color:var(--danger); }
   button.btn:focus-visible, label.btn:focus-visible { outline:3px solid var(--accent-ring); outline-offset:1px; }
 
-  /* ---------- Form control ---------- */
-  input, select, textarea { font:inherit; color:var(--ink); padding:7px 10px; border:1px solid var(--line-strong); border-radius:6px; background:var(--card); transition:border-color .15s, box-shadow .15s; }
-  input:hover, select:hover, textarea:hover { border-color:#94a3b8; }
-  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-ring); }
-  input::placeholder, textarea::placeholder { color:var(--subtle); }
+  /* ---------- Isian ---------- */
+  input, select, textarea { font:inherit; color:var(--ink); padding:7px 10px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); background:var(--surface); transition:border-color .15s, box-shadow .15s; }
+  input:hover, select:hover, textarea:hover { border-color:var(--navy-400); }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--forest); box-shadow:0 0 0 3px var(--accent-ring); }
+  input::placeholder, textarea::placeholder { color:var(--navy-400); }
   input[type=number] { width:72px; text-align:center; }
-  input[type=checkbox] { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+  input[type=checkbox] { width:16px; height:16px; accent-color:var(--forest); cursor:pointer; }
   input[type=date] { padding:6px 10px; }
-  select { cursor:pointer; padding-right:28px; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position:right 9px center; }
+  select { cursor:pointer; padding-right:28px; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A5A73' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position:right 9px center; }
+  select:disabled { background-color:var(--hover); color:var(--muted); cursor:not-allowed; }
   textarea { line-height:1.5; }
 
   /* ---------- Tabel data (input & daftar santri) ---------- */
   table.grid { border-collapse:separate; border-spacing:0; width:100%; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
-  table.grid th, table.grid td { border-bottom:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:middle; }
-  table.grid th { background:#f1f5f9; color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.4px; }
+  table.grid th, table.grid td { border-bottom:1px solid var(--line-soft); padding:9px 10px; text-align:left; vertical-align:middle; }
+  table.grid th { background:var(--sage); color:var(--navy-600); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.5px; border-bottom-color:var(--sage-300); }
   table.grid tbody tr:nth-child(even) td { background:var(--zebra); }
   table.grid tbody tr:hover td { background:var(--hover); }
   table.grid tbody tr:last-child td { border-bottom:0; }
   table.grid td:first-child { color:var(--subtle); font-size:12px; width:36px; text-align:center; }
   table.grid td .small { display:inline-block; margin-top:2px; }
-  table.grid td input[style*="width:100%"] { min-width:120px; }
+  table.grid td input.wide { width:100%; min-width:120px; }
   table.grid td select + input, table.grid td input + input { margin-left:2px; }
-  table.grid tbody tr:hover td .x { color:#cbd5e1; }
+  table.grid tbody tr:hover td .x { color:var(--navy-400); }
+
+  /* Input Setoran: penanda baris yang sudah terisi untuk periode terpilih */
+  @media (min-width: 769px) {
+    table.grid.input-grid tbody tr td:first-child { position:relative; }
+    table.grid.input-grid tbody tr.isi td:first-child { color:var(--forest); font-weight:700; }
+    table.grid.input-grid tbody tr.isi td:first-child::after { content:""; position:absolute; left:0; top:8px; bottom:8px; width:3px; border-radius:0 3px 3px 0; background:var(--forest); }
+  }
+  table.grid tbody tr.flash td { animation:flash 1.6s ease-out; }
+  @keyframes flash { 0%,30% { background:var(--gold-50); } 100% { background:transparent; } }
+  .in-head { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; margin-bottom:12px; }
+  .in-head h2 { margin:0; }
+  .count { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--navy); background:var(--sage); border-radius:999px; padding:4px 12px; white-space:nowrap; }
+  .count b { color:var(--forest); }
+
+  /* tabel isian kunci–nilai (pengaturan semester) */
+  table.kv { border-collapse:collapse; width:100%; max-width:720px; }
+  table.kv td { padding:8px 0; border-bottom:1px solid var(--line-soft); vertical-align:middle; }
+  table.kv td:first-child { width:44%; color:var(--muted); font-weight:500; padding-right:16px; }
+  table.kv tr:last-child td { border-bottom:0; }
 
   /* tombol hapus baris */
-  .x { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; margin:0 auto; color:var(--subtle); background:none; border:0; border-radius:50%; cursor:pointer; font-size:15px; line-height:1; transition:color .15s, background .15s; }
-  .x:hover { color:var(--danger) !important; background:#fef2f2; }
-  table.grid td:has(> .x) { text-align:center; width:44px; }
+  .x { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; margin:0 auto; color:var(--navy-400); background:none; border:0; border-radius:50%; cursor:pointer; font-size:15px; line-height:1; transition:color .15s, background .15s; }
+  .x:hover { color:var(--danger) !important; background:var(--danger-50); }
+  table.grid td.c-del { text-align:center; width:44px; }
 
-  /* ---------- Lembar perkembangan (tampilan layar) ---------- */
-  .page { background:#fff; width:297mm; min-height:210mm; margin:0 auto 20px; padding:8mm 10mm 12mm; border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow-md); page-break-after:always; break-after:page; position:relative; }
+  /* ---------- Lembar perkembangan A4 (layar & cetak) ----------
+     Ukuran, huruf, dan jarak di bagian ini dipakai oleh perhitungan pemisahan halaman (pageFor).
+     Ubah warna saja; jangan ubah ukuran tanpa memeriksa ulang jumlah halaman tiap kelompok. */
+  .sheets { transform-origin:top left; }
+  .page { background:#fff; width:297mm; min-height:210mm; margin:0 auto 20px; padding:8mm 10mm 12mm; border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow-md); page-break-after:always; break-after:page; position:relative; color:var(--sheet-ink); font-family:"Segoe UI", system-ui, -apple-system, sans-serif; line-height:1.45; }
   .page:last-child { page-break-after:auto; break-after:auto; }
-  .ph { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid var(--primary); padding-bottom:2mm; margin-bottom:2.5mm; }
+  .ph { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid var(--sheet-brand); padding-bottom:2mm; margin-bottom:2.5mm; }
   .ph .left { display:flex; align-items:center; gap:4mm; }
   .ph img.plogo { width:17mm; height:17mm; object-fit:contain; flex:none; }
-  .ph .t1 { font-size:11pt; font-weight:700; letter-spacing:.4px; color:var(--muted); text-transform:uppercase; }
-  .ph .t2 { font-size:16pt; font-weight:700; color:var(--primary); margin-top:1mm; letter-spacing:-.1px; }
-  .ph .t3 { font-size:9pt; color:var(--muted); margin-top:1mm; }
-  .ph .part { font-size:10pt; font-weight:500; color:var(--muted); }
-  .ph .right { text-align:right; font-size:9pt; color:var(--muted); line-height:1.4; }
+  .ph .t1 { font-size:11pt; font-weight:700; letter-spacing:.4px; color:var(--sheet-muted); text-transform:uppercase; }
+  .ph .t2 { font-size:16pt; font-weight:700; color:var(--sheet-brand); margin-top:1mm; letter-spacing:-.1px; }
+  .ph .t3 { font-size:9pt; color:var(--sheet-muted); margin-top:1mm; }
+  .ph .part { font-size:10pt; font-weight:500; color:var(--sheet-muted); }
+  .ph .right { text-align:right; font-size:9pt; color:var(--sheet-muted); line-height:1.4; }
 
   table.sheet { border-collapse:collapse; width:100%; table-layout:fixed; font-size:7.5pt; }
-  table.sheet th, table.sheet td { border:1px solid #cbd5e1; padding:0.6mm 0.7mm; text-align:center; overflow:hidden; }
-  table.sheet th { background:#f1f5f9; color:#334155; font-weight:600; font-size:7.5pt; line-height:1.15; }
-  table.sheet tbody tr:nth-child(even) td:not(.cell) { background:#fafbfc; }
-  table.sheet td.nm { text-align:left; font-weight:600; font-size:8pt; white-space:nowrap; text-overflow:ellipsis; color:var(--ink); }
+  table.sheet th, table.sheet td { border:1px solid var(--sheet-line); padding:0.6mm 0.7mm; text-align:center; overflow:hidden; }
+  table.sheet th { background:var(--sheet-head); color:var(--sheet-ink); font-weight:600; font-size:7.5pt; line-height:1.15; }
+  table.sheet tbody tr:nth-child(even) td:not(.cell) { background:var(--sheet-zebra); }
+  table.sheet td.nm { text-align:left; font-weight:600; font-size:8pt; white-space:nowrap; text-overflow:ellipsis; color:var(--sheet-ink); }
   table.sheet td.nm.long { font-size:7pt; }
-  table.sheet td.no { font-size:8pt; color:var(--muted); }
-  table.sheet td.cell { line-height:1.0; padding:0.3mm 0.4mm; font-size:7pt; white-space:nowrap; text-align:center; border:1px solid #e2e8f0; transition:all .2s ease; }
+  table.sheet td.nm .kls { font-weight:400; color:var(--sheet-muted); }
+  table.sheet td.no { font-size:8pt; color:var(--sheet-muted); }
+  table.sheet td.cell { line-height:1.0; padding:0.3mm 0.4mm; font-size:7pt; white-space:nowrap; text-align:center; border:1px solid var(--sheet-line-soft); transition:all .2s ease; }
   table.sheet tbody tr:hover td.cell { filter:brightness(.96); }
   table.sheet td.cell .sn { display:block; font-size:6pt; letter-spacing:-.2px; }
   table.sheet td.cell.done { font-weight:700; }
   table.sheet td.sum { font-size:8pt; font-variant-numeric:tabular-nums; }
 
-  .bar { position:relative; height:3.8mm; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:3px; overflow:hidden; }
-  .bar > i { position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,var(--accent),var(--primary)); }
+  .bar { position:relative; height:3.8mm; background:var(--sheet-head); border:1px solid var(--sheet-line); border-radius:3px; overflow:hidden; }
+  .bar > i { position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,var(--forest-600),var(--forest)); }
   .bar > b { position:absolute; inset:0; font-size:7pt; line-height:3.6mm; text-align:center; font-weight:600; }
-  .pf { position:absolute; left:10mm; right:10mm; bottom:5mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); }
+  .pf { position:absolute; left:10mm; right:10mm; bottom:5mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--sheet-muted); }
   .legend { display:flex; gap:5px; align-items:center; }
-  .legend i { display:inline-block; width:7mm; height:3.5mm; border:1px solid #cbd5e1; border-radius:2px; }
+  .legend i { display:inline-block; width:7mm; height:3.5mm; border:1px solid var(--sheet-line); border-radius:2px; }
 
   /* grafik garis SVG (dibuat JS) */
-  svg.chart { display:block; width:100%; height:auto; background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%); border:1px solid var(--line); border-radius:6px; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; }
-  svg.chart .grid { stroke:#e2e8f0; stroke-width:1; stroke-dasharray:3 3; }
-  svg.chart .axis { fill:#64748b; font-size:10.5px; }
-  svg.chart .axis-strong { font-size:11px; font-weight:600; }
+  svg.chart { display:block; width:100%; height:auto; background:#fff; border:1px solid var(--line); border-radius:6px; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; }
+  svg.chart .grid { stroke:#E3E7E1; stroke-width:1; stroke-dasharray:3 3; }
+  svg.chart .zero { stroke:#B9C4B6; stroke-width:1; }
+  svg.chart .axis { fill:#4A5A73; font-size:10.5px; }
+  svg.chart .axis-strong { font-size:11px; font-weight:600; fill:#1B2A41; }
   svg.chart .axis-sub { font-size:10px; }
-  svg.chart .target { stroke:#0f766e; stroke-width:1.2; stroke-dasharray:5 4; opacity:.8; }
-  svg.chart .target-label { fill:#0f766e; font-size:10px; font-weight:600; }
   svg.chart .line { fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
   svg.chart .dot { fill:#ffffff; stroke-width:2; }
   svg.chart .series-label { font-size:10.5px; font-weight:600; }
 
   /* ---------- Layar masuk (peran + PIN) ---------- */
-  .login { min-height:calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding:24px 12px; background:#f8fafc; }
-  .login-box { background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.06); padding:32px 28px 24px; width:100%; max-width:420px; text-align:center; }
-  .login-box .logo-frame { width:112px; height:112px; margin:0 auto 14px; border-radius:50%; background:#f0fdf4; border:1px solid #dcfce7; display:flex; align-items:center; justify-content:center; }
-  .login-box .logo-frame img { width:88px; height:88px; object-fit:contain; }
-  .login-box h1 { font-size:20px; font-weight:700; color:#0f172a; margin:4px 0 6px; letter-spacing:-.2px; }
-  .login-box .sub { font-size:14px; color:#64748b; margin:0 0 18px; line-height:1.5; }
-  .roles { display:grid; gap:10px; margin:0 0 16px; text-align:left; }
-  .role-btn { display:flex; align-items:center; gap:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; cursor:pointer; font:inherit; color:#334155; min-height:52px; transition:all .15s; box-sizing:border-box; }
-  .role-btn .ic { width:34px; height:34px; border-radius:10px; background:#fff; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:16px; flex:none; }
-  .role-btn .t { display:flex; flex-direction:column; align-items:flex-start; text-align:left; line-height:1.2; }
-  .role-btn .ic svg { width:20px; height:20px; stroke:#475569; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+  .login { min-height:calc(100vh - var(--stick-top) - 150px); display:flex; align-items:center; justify-content:center; padding:32px 12px; background:var(--ivory); }
+  .login-box { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow-md); padding:34px 30px 24px; width:100%; max-width:420px; text-align:center; }
+  .login-box .logo-frame { width:112px; height:112px; margin:0 auto 16px; border-radius:50%; background:var(--sage); box-shadow:0 0 0 1px var(--surface), 0 0 0 2px var(--gold); display:flex; align-items:center; justify-content:center; }
+  .login-box .logo-frame img { width:86px; height:86px; object-fit:contain; }
+  .login-box h1 { font-family:var(--serif); font-size:24px; font-weight:700; color:var(--navy); margin:6px 0 6px; letter-spacing:-.1px; }
+  .login-box .sub { font-size:14px; color:var(--muted); margin:0 0 20px; line-height:1.5; }
+  .roles { display:grid; gap:10px; margin:0 0 18px; text-align:left; }
+  .role-btn { display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line-strong); border-radius:12px; padding:12px 14px; cursor:pointer; font:inherit; font-weight:600; color:var(--navy); min-height:56px; transition:border-color .15s, background .15s; box-sizing:border-box; }
+  .role-btn .ic { width:36px; height:36px; border-radius:10px; background:var(--sage); display:flex; align-items:center; justify-content:center; flex:none; }
+  .role-btn .t { display:flex; flex-direction:column; align-items:flex-start; text-align:left; line-height:1.25; }
+  .role-btn .ic svg { width:20px; height:20px; stroke:var(--forest); fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
   .role-btn.active .ic svg { stroke:#fff; }
-  .role-btn .t small { font-size:11.5px; color:#64748b; font-weight:400; margin-top:2px; }
-  .role-btn:hover { border-color:#a7f3d0; background:#f0fdf4; }
-  .role-btn.active { background:#ecfdf5; border:2px solid #059669; color:#047857; font-weight:600; padding:11px 13px; }
-  .role-btn.active .ic { background:#059669; color:#fff; border-color:#059669; }
-  .role-btn.active .t small { color:#059669; }
+  .role-btn .t small { font-size:12px; color:var(--muted); font-weight:400; margin-top:2px; }
+  .role-btn:hover { border-color:var(--forest-600); background:var(--zebra); }
+  .role-btn.active { background:var(--forest-50); border:2px solid var(--forest); color:var(--forest); padding:11px 13px; }
+  .role-btn.active .ic { background:var(--forest); }
+  .role-btn.active .t small { color:var(--forest); }
+  .role-btn:focus-visible { outline:3px solid var(--accent-ring); outline-offset:2px; }
   .login-box .field { text-align:left; margin-bottom:12px; }
-  .login-box .field label { display:block; font-size:12.5px; font-weight:600; color:#334155; margin-bottom:6px; }
-  .login-box input#pin { width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; text-align:center; font-size:20px; letter-spacing:4px; padding:11px 12px; min-height:48px; }
-  .login-box input#pin:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.18); outline:none; }
-  .login-box .btn-masuk { width:100%; background:#059669; color:#fff; font-weight:700; font-size:15px; border:0; border-radius:8px; padding:12px; cursor:pointer; transition:background .15s, transform .05s; }
-  .login-box .btn-masuk:hover { background:#047857; }
-  .login-box .btn-masuk:active { transform:translateY(1px); background:#065f46; }
-  .login-box .btn-masuk:disabled { background:#6ee7b7; cursor:wait; }
-  .pinlain { border-top:1px dashed var(--line); margin-top:12px; padding-top:12px; }
+  .login-box .field label { display:block; font-size:12.5px; font-weight:600; color:var(--navy); margin-bottom:6px; }
+  .login-box input#pin { width:100%; background:var(--surface); border:1px solid var(--line-strong); border-radius:8px; text-align:center; font-size:20px; letter-spacing:4px; padding:11px 12px; min-height:50px; }
+  .login-box input#pin:focus { border-color:var(--forest); box-shadow:0 0 0 3px var(--accent-ring); outline:none; }
+  .login-box .btn-masuk { width:100%; background:var(--forest); color:#fff; font:inherit; font-weight:700; font-size:15px; border:0; border-radius:8px; padding:13px; min-height:48px; cursor:pointer; transition:background .15s, transform .05s; }
+  .login-box .btn-masuk:hover { background:#174a33; }
+  .login-box .btn-masuk:active { transform:translateY(1px); background:#123b29; }
+  .login-box .btn-masuk:disabled { background:var(--forest-600); opacity:.7; cursor:wait; }
+  .pinlain { border-top:1px solid var(--line-soft); margin-top:14px; padding-top:14px; }
   .pin-msg { color:var(--danger); font-size:13px; min-height:18px; margin-top:10px; }
-  .login-box .foot { font-size:11.5px; color:#94a3b8; margin-top:14px; }
-  .linkbtn { background:none; border:0; color:var(--muted); cursor:pointer; font:inherit; font-size:12px; text-decoration:underline; padding:0 4px; }
-  .pill { display:inline-block; background:var(--accent-soft); color:var(--primary); border-radius:999px; padding:3px 10px; font-size:12px; font-weight:600; }
-  #rolebadge { display:flex; align-items:center; gap:4px; margin-right:12px; }
-  .sync { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; border-radius:999px; padding:3px 10px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
-  .sync::before { content:"●"; font-size:9px; }
-  .sync.ok { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
-  .sync.busy { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
-  .sync.off { background:#fff7ed; color:#b45309; border-color:#fed7aa; }
-  .sync.err { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+  .login-box .foot { font-size:12px; color:var(--subtle); margin-top:14px; letter-spacing:.3px; }
+  .linkbtn { background:none; border:0; color:var(--muted); cursor:pointer; font:inherit; font-size:12.5px; padding:4px 6px; border-radius:6px; white-space:nowrap; }
+  .linkbtn:hover { color:var(--forest); background:var(--forest-50); }
+  .pill { display:inline-block; background:var(--sage); color:var(--navy); border-radius:999px; padding:3px 11px; font-size:12px; font-weight:600; }
+  #rolebadge { display:flex; align-items:center; gap:2px; margin-right:12px; align-self:center; }
+
+  /* status sinkron (kelas diganti penuh oleh updateSyncStat: "sync ok|busy|off|err") */
+  .sync { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; font-size:12px; font-weight:600; border-radius:999px; padding:3px 10px; background:var(--hover); color:var(--muted); border:1px solid var(--line); }
+  .sync::before { content:""; width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .sync.ok { background:var(--forest-50); color:var(--forest); border-color:var(--forest-100); }
+  .sync.busy { background:var(--navy-50); color:var(--navy); border-color:#D6DDE8; }
+  .sync.off { background:var(--amber-50); color:var(--amber); border-color:var(--amber-200); }
+  .sync.err { background:var(--danger-50); color:var(--danger); border-color:var(--danger-200); }
   .sync:empty { display:none; }
   #msync { display:none; }
-  @media (max-width: 768px) { #msync { display:inline-flex; margin:8px 12px 0; } #msync:empty { display:none; } }
 
   /* footer situs */
-  #sfoot { background:var(--card); border-top:1px solid var(--line); text-align:center; padding:22px 16px 24px; color:var(--muted); font-size:13px; line-height:1.55; }
-  #sfoot .f1 { font-weight:700; color:var(--ink); font-size:14px; }
-  #sfoot .f2 { color:var(--primary); font-weight:600; margin:2px 0 6px; }
+  #sfoot { background:var(--surface); border-top:1px solid var(--line); text-align:center; padding:24px 16px 26px; color:var(--muted); font-size:13px; line-height:1.6; }
+  #sfoot::before { content:""; display:block; width:40px; height:2px; background:var(--gold); margin:0 auto 14px; border-radius:2px; }
+  #sfoot .f1 { font-family:var(--serif); font-weight:700; color:var(--navy); font-size:15px; }
+  #sfoot .f2 { color:var(--forest); font-weight:600; margin:2px 0 6px; }
   #sfoot .f3 { max-width:640px; margin:0 auto 6px; }
-  #sfoot a { color:var(--accent); font-weight:700; text-decoration:none; }
+  #sfoot a { color:var(--forest); font-weight:700; text-decoration:none; }
   #sfoot a:hover { text-decoration:underline; }
-  main { min-height:calc(100vh - 56px - 150px); }
-  .login { min-height:calc(100vh - 56px - 150px); }
-  @media (max-width: 768px) { #sfoot { padding-bottom:calc(96px + env(safe-area-inset-bottom)); } main { min-height:0; } }
+  main { min-height:calc(100vh - var(--stick-top) - 150px); }
 
   /* header atas khusus ponsel */
   #mhead { display:none; }
-  @media (max-width: 768px) {
-    #mhead { display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:6; background:var(--card); border-bottom:1px solid var(--line); padding:9px 14px; box-shadow:var(--shadow); }
-    #mhead img { width:34px; height:34px; object-fit:contain; }
-    #mhead .mtitle { font-weight:700; color:var(--primary); font-size:15px; flex:1; line-height:1.2; }
-    #mhead #mrole { font-size:11px; font-weight:600; color:var(--primary); background:var(--accent-soft); border-radius:999px; padding:3px 9px; white-space:nowrap; }
-    #mhead.hidden { display:none; }
-    #mhead #mlogout { font-size:12px; color:var(--danger); text-decoration:none; font-weight:600; padding:6px 2px 6px 6px; }
-    #rolebadge { display:none !important; }
+
+  /* tombol kembali ke atas */
+  .ls { display:none; }
+  #totop { display:none; position:fixed; right:16px; bottom:88px; z-index:20; width:48px; height:48px; border-radius:50%; border:0; background:var(--forest); color:#fff; font-size:22px; line-height:1; cursor:pointer; box-shadow:0 4px 12px rgba(30,91,63,.3); transition:background .15s, transform .15s, opacity .2s; }
+  #totop:active, #totop.pressed { background:#E2B740; color:var(--navy); transform:scale(.94); }
+
+  /* =====================================================
+     RINGKASAN — dasbor pemantauan
+     ===================================================== */
+  .rk-head { padding:4px 0 18px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+  .rk-eyebrow { font-size:11.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); }
+  .rk-titlerow { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 20px; margin-top:6px; }
+  .rk-title { font-family:var(--serif); font-size:30px; line-height:1.15; font-weight:700; color:var(--navy); margin:0; letter-spacing:-.2px; }
+  .rk-title::after { content:""; display:block; width:44px; height:2px; background:var(--gold); border-radius:2px; margin-top:10px; }
+  .rk-meta { margin-top:10px; color:var(--muted); font-size:14px; }
+  .rk-meta b { color:var(--navy); font-weight:600; }
+  .rk-period { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--muted); white-space:nowrap; }
+  .rk-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+  .chip { border:1px solid var(--line-strong); background:var(--surface); color:var(--navy); font:inherit; font-size:13px; font-weight:500; padding:6px 13px; border-radius:999px; cursor:pointer; white-space:nowrap; transition:background .15s, border-color .15s; }
+  .chip:hover { border-color:var(--forest-600); }
+  .chip.on { background:var(--forest); border-color:var(--forest); color:#fff; font-weight:600; }
+  .chip:focus-visible { outline:3px solid var(--accent-ring); outline-offset:1px; }
+
+  /* angka ringkas: satu pita, bukan kartu terpisah */
+  .rk-stats { display:grid; grid-template-columns:repeat(5,1fr); background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); margin-bottom:22px; }
+  .stat { padding:14px 18px; border-left:1px solid var(--line-soft); min-width:0; }
+  .stat:first-child { border-left:0; }
+  .stat .lb { font-size:11.5px; font-weight:600; letter-spacing:.4px; text-transform:uppercase; color:var(--muted); }
+  .stat .v { font-family:var(--serif); font-size:26px; font-weight:700; color:var(--navy); line-height:1.2; margin-top:4px; font-variant-numeric:tabular-nums; }
+  .stat .v small { font-family:var(--sans); font-size:13px; font-weight:500; color:var(--muted); margin-left:3px; }
+  .stat .d { font-size:12px; color:var(--subtle); margin-top:2px; line-height:1.35; }
+  .stat.milestone .v { color:var(--navy); }
+  .stat.milestone .v::before { content:""; display:inline-block; width:9px; height:9px; transform:rotate(45deg); border:1.5px solid var(--gold); margin:0 9px 4px 1px; vertical-align:middle; }
+
+  /* Perlu perhatian */
+  .rk-att { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px 16px; margin-bottom:26px; }
+  .rk-att-h { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 16px; margin-bottom:14px; }
+  .rk-att-h h2 { margin:0; font-size:20px; }
+  .rk-att-h .muted { font-size:13px; }
+  .att-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .att { border:1px solid var(--line-soft); border-top:3px solid var(--line-strong); border-radius:8px; padding:12px 14px; background:var(--zebra); min-width:0; }
+  .att.t-belum { border-top-color:var(--navy-400); }
+  .att.t-tetap { border-top-color:#C88A1A; }
+  .att.t-turun { border-top-color:var(--danger); }
+  .att-t { display:flex; align-items:baseline; gap:8px; font-weight:600; color:var(--navy); font-size:14px; }
+  .att-t .n { font-family:var(--serif); font-size:22px; font-weight:700; line-height:1; }
+  .att.t-tetap .att-t .n { color:var(--amber); }
+  .att.t-turun .att-t .n { color:var(--danger); }
+  .att-d { font-size:12.5px; color:var(--muted); margin:3px 0 9px; line-height:1.4; }
+  .att ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; max-height:236px; overflow:auto; }
+  .att li { display:flex; flex-direction:column; align-items:flex-start; gap:1px; font-size:13px; padding:6px 0; border-top:1px dashed var(--line); }
+  .att li:first-child { border-top:0; }
+  .att li .nm { color:var(--navy); font-weight:600; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .att li .ex { color:var(--muted); font-size:12px; line-height:1.4; }
+  .att button.nm { background:none; border:0; padding:0; font:inherit; font-weight:600; cursor:pointer; text-align:left; text-decoration:underline; text-decoration-color:var(--sage-300); text-underline-offset:3px; }
+  .att button.nm:hover { color:var(--forest); text-decoration-color:var(--forest); }
+  .att .none { font-size:13px; color:var(--muted); padding:2px 0; }
+  .att-note { font-size:12px; color:var(--muted); margin-top:12px; }
+  .att-ok { display:flex; align-items:center; gap:10px; color:var(--forest); font-weight:600; }
+
+  /* bagian bawah: perkembangan & grafik */
+  .rk-sec { margin-bottom:28px; }
+  .rk-sec-h { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 16px; margin-bottom:10px; }
+  .rk-sec-h h2 { margin:0; }
+  .rk-sec-h .muted { font-size:13px; }
+  .rk-sec.minor h2 { font-size:16px; color:var(--navy-600); }
+
+  /* tabel perkembangan santri (desktop) */
+  table.rk { width:100%; border-collapse:separate; border-spacing:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  table.rk th { text-align:left; font-size:11.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--navy-600); background:var(--sage); padding:9px 12px; border-bottom:1px solid var(--sage-300); white-space:nowrap; }
+  table.rk td { padding:9px 12px; border-bottom:1px solid var(--line-soft); vertical-align:middle; font-size:13.5px; }
+  table.rk tr.main:hover td { background:var(--zebra); }
+  table.rk tr.det td { background:var(--zebra); padding:10px 12px 14px 56px; }
+  table.rk tr.det[hidden] { display:none; }
+  table.rk tbody tr:last-child td { border-bottom:0; }
+  table.rk td.num, table.rk th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.rk .nmc { min-width:170px; }
+  table.rk .nmc b { color:var(--navy); font-weight:600; }
+  table.rk .nmc span { color:var(--muted); font-size:12px; margin-left:6px; }
+  table.rk .pos { white-space:nowrap; color:var(--navy); }
+  table.rk .pos small { color:var(--subtle); margin-left:6px; font-size:11.5px; }
+  .rank { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; border:1px solid var(--sage-300); color:var(--navy-600); font-size:12px; font-weight:600; font-variant-numeric:tabular-nums; background:var(--surface); flex:none; }
+  .rank.done { border-color:var(--gold); color:var(--gold-text); box-shadow:inset 0 0 0 2px var(--surface), inset 0 0 0 3px var(--gold-50); }
+  .spark { display:block; }
+  .spark .sl { fill:none; stroke:var(--navy-600); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+  .spark .sd { fill:var(--forest); }
+  .spark .sdn { fill:var(--danger); }
+  .pbar { display:flex; align-items:center; gap:8px; min-width:150px; }
+  .pbar .tr { position:relative; flex:1; height:6px; background:var(--sage); border-radius:6px; overflow:hidden; }
+  .pbar .tr i { position:absolute; left:0; top:0; bottom:0; background:var(--forest); border-radius:6px; }
+  .pbar .pc { font-size:12.5px; font-weight:600; color:var(--navy); min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+  .pbar .tj { font-size:11.5px; color:var(--subtle); white-space:nowrap; }
+  .mile { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; color:var(--gold-text); border:1px solid var(--gold); background:var(--surface); border-radius:999px; padding:1px 8px; white-space:nowrap; }
+  .st { display:inline-flex; align-items:center; font-size:12px; font-weight:600; border-radius:999px; padding:2px 9px; white-space:nowrap; border:1px solid transparent; }
+  .st.naik { background:var(--forest-50); color:var(--forest); }
+  .st.tetap { background:var(--amber-50); color:var(--amber); border-color:var(--amber-200); }
+  .st.turun { background:var(--danger-50); color:var(--danger); border-color:var(--danger-200); }
+  .st.belum { background:var(--surface); color:var(--muted); border-color:var(--line-strong); border-style:dashed; }
+  .st.na { background:transparent; color:var(--subtle); padding-left:0; padding-right:0; font-weight:500; }
+  .detbtn { background:none; border:1px solid var(--line); border-radius:6px; color:var(--muted); font:inherit; font-size:12px; padding:4px 9px; cursor:pointer; white-space:nowrap; }
+  .detbtn:hover, .detbtn[aria-expanded="true"] { color:var(--forest); border-color:var(--forest); background:var(--forest-50); }
+  .hist { display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr)); gap:6px; }
+  .hist .h { background:var(--surface); border:1px solid var(--line-soft); border-radius:6px; padding:6px 9px; }
+  .hist .h .p { font-size:11px; color:var(--subtle); letter-spacing:.3px; }
+  .hist .h .e { font-size:13px; color:var(--navy); font-weight:600; }
+  .hist .h .e.kosong { color:var(--subtle); font-weight:400; }
+  .hist .h .dl { font-size:12px; font-weight:600; }
+  .dl.up { color:var(--forest); } .dl.eq { color:var(--amber); } .dl.dn { color:var(--danger); } .dl.na { color:var(--subtle); font-weight:400; }
+
+  /* kartu santri (ponsel) */
+  .rk-cards { display:none; }
+  .scard { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; margin-bottom:8px; }
+  .scard .top { display:flex; align-items:center; gap:10px; }
+  .scard .top .nmc { flex:1; min-width:0; }
+  .scard .top .nmc b { display:block; color:var(--navy); font-weight:600; font-size:14.5px; line-height:1.25; }
+  .scard .top .nmc span { color:var(--muted); font-size:12px; }
+  .scard .row2 { display:grid; grid-template-columns:1fr auto; gap:4px 12px; margin:10px 0 8px; font-size:13px; }
+  .scard .row2 .k { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.4px; }
+  .scard .row2 .val { color:var(--navy); font-weight:600; }
+  .scard .row2 .r { text-align:right; }
+  .scard details { margin-top:8px; border-top:1px solid var(--line-soft); padding-top:4px; }
+  .scard summary { list-style:none; display:flex; align-items:center; justify-content:space-between; min-height:40px; font-size:13px; font-weight:600; color:var(--forest); }
+  .scard summary::-webkit-details-marker { display:none; }
+  .scard summary::after { content:""; width:8px; height:8px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); margin-right:6px; transition:transform .15s; }
+  .scard details[open] summary::after { transform:rotate(-135deg); }
+  .scard .hist { grid-template-columns:1fr 1fr; }
+
+  /* ringkasan per kelompok (tampilan "Semua") */
+  .grp { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .grp-row { display:grid; grid-template-columns:minmax(180px,1.6fr) repeat(4,minmax(90px,1fr)) minmax(170px,1.3fr) auto; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--line-soft); }
+  .grp-row:last-child { border-bottom:0; }
+  .grp-row.h { background:var(--sage); font-size:11.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--navy-600); border-bottom-color:var(--sage-300); }
+  .grp-row .g { font-weight:600; color:var(--navy); }
+  .grp-row .num { font-variant-numeric:tabular-nums; color:var(--navy); }
+  .grp-row .num small { color:var(--muted); }
+  .grp-row .fl { display:flex; flex-wrap:wrap; gap:4px; }
+  .grp-row .k { display:none; }
+
+  .chartbox { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px; overflow-x:auto; }
+  .chartbox svg.chart { border:0; min-width:720px; }
+  .rk-foot { font-size:12px; color:var(--muted); line-height:1.6; border-top:1px solid var(--line); padding-top:12px; margin-top:8px; }
+
+  /* =====================================================
+     Tablet (≤ 1100px): label menu dipendekkan
+     ===================================================== */
+  @media (max-width: 1100px) {
+    nav { padding:0 14px; }
+    nav .brand { margin-right:10px; font-size:15px; }
+    nav .brand .bt { display:none; }
+    .rk-stats { grid-template-columns:repeat(3,1fr); }
+    .stat:nth-child(4) { border-left:0; }
+    .stat:nth-child(n+4) { border-top:1px solid var(--line-soft); }
+    .grp-row { grid-template-columns:minmax(160px,1.6fr) repeat(4,minmax(70px,1fr)) auto; }
+    .grp-row .fl-col { display:none; }
+    /* menu lebih ringkas: "Muat ulang" tetap ada di Pengaturan, status sinkron dipendekkan */
+    #rolebadge .linkbtn[title] { display:none; }
+    #savestat.sync { display:inline-block; max-width:190px; overflow:hidden; text-overflow:ellipsis; vertical-align:middle; }
+    #savestat.sync::before { display:inline-block; margin-right:6px; vertical-align:1px; }
+    #savestat.sync:empty { display:none; }
+    table.rk .c-tren { display:none; }
+    .pbar { min-width:120px; }
+  }
+  @media (max-width: 1400px) and (min-width: 769px) {
+    nav button .lf { display:none; } nav button .ls { display:inline; }
+    nav button { padding:0 12px; }
   }
 
-  /* ---------- Responsif: layar sempit (ponsel) ---------- */
-  .ls { display:none; }
-  #totop { display:none; position:fixed; right:16px; bottom:84px; z-index:20; width:48px; height:48px; border-radius:50%; border:0; background:#059669; color:#fff; font-size:22px; line-height:1; cursor:pointer; box-shadow:0 4px 12px rgba(5,150,105,.35); transition:background .15s, transform .15s, opacity .2s; }
-  #totop:active, #totop.pressed { background:#facc15; color:#1e293b; transform:scale(.94); }
+  /* =====================================================
+     Ponsel (≤ 768px)
+     ===================================================== */
   @media (max-width: 768px) {
+    :root { --stick-top:53px; }
+    #msync { display:inline-flex; margin:10px 14px 0; } #msync:empty { display:none; }
+    #sfoot { padding-bottom:calc(100px + env(safe-area-inset-bottom)); } main { min-height:0; }
+    .login { min-height:0; padding:24px 14px; }
+    .login-box { padding:28px 20px 22px; box-shadow:none; }
+
+    #mhead { display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:6; background:var(--surface); border-bottom:1px solid var(--line); padding:9px 14px; height:var(--stick-top); }
+    #mhead img { width:34px; height:34px; object-fit:contain; }
+    #mhead .mtitle { font-family:var(--serif); font-weight:700; color:var(--navy); font-size:16px; flex:1; line-height:1.2; min-width:0; }
+    #mhead #mrole { font-size:11px; font-weight:600; color:var(--navy); background:var(--sage); border-radius:999px; padding:3px 9px; white-space:nowrap; }
+    #mhead.hidden { display:none; }
+    #mhead #mlogout { font-size:12.5px; color:var(--danger); text-decoration:none; font-weight:600; padding:8px 2px 8px 8px; }
+    #rolebadge { display:none !important; }
+
     .lf { display:none; } .ls { display:inline; }
     #totop.show { display:flex; align-items:center; justify-content:center; }
-    /* tab bar di bawah layar */
-    nav { position:fixed; top:auto; bottom:0; left:0; right:0; border-top:1px solid var(--line); border-bottom:0; padding:6px 8px calc(6px + env(safe-area-inset-bottom)); gap:4px; box-shadow:0 -2px 10px rgba(15,23,42,.06); }
+    /* menu bawah: ikon + label pendek */
+    nav { position:fixed; top:auto; bottom:0; left:0; right:0; height:auto; border-top:1px solid var(--line); border-bottom:0; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); gap:0; box-shadow:0 -2px 12px rgba(27,42,65,.06); }
     nav .brand, nav > span, #savestat { display:none; }
-    nav button { flex:1; padding:9px 4px; font-size:12.5px; border-radius:10px; min-height:44px; }
-    main { padding:12px 12px 16px; }
+    nav button { flex:1; flex-direction:column; justify-content:center; gap:2px; padding:6px 2px; font-size:11px; min-height:54px; border-radius:10px; min-width:0; }
+    nav button .ni { display:block; height:22px; }
+    nav button::after { left:28%; right:28%; top:0; bottom:auto; height:3px; border-radius:0 0 3px 3px; }
+    nav button.active { background:var(--forest-50); }
+
+    main { padding:14px 12px 18px; }
     .card { padding:14px; }
-    h2 { font-size:15px; }
+    h2 { font-size:17px; }
     main > .toolbar { padding:12px; }
     .toolbar label { width:100%; }
-    .toolbar label select { flex:1; }
+    .toolbar label select { flex:1; min-width:0; }
     .toolbar button.btn { width:100%; justify-content:center; }
     select, input:not([type=checkbox]), button.btn, label.btn { min-height:44px; }
+
     /* tabel data -> kartu per santri */
     table.grid, table.grid tbody, table.grid tr, table.grid td { display:block; width:100%; }
     table.grid thead { display:none; }
     table.grid { border:0; border-radius:0; overflow:visible; }
-    table.grid tbody tr { position:relative; background:#fff; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; padding:10px 12px 10px 46px; box-shadow:var(--shadow); }
+    table.grid tbody tr { position:relative; background:var(--surface); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; padding:10px 12px 10px 48px; }
     table.grid tbody tr:nth-child(even) td, table.grid tbody tr:hover td { background:transparent; }
     table.grid td { border:0; padding:4px 0; text-align:left; }
     table.grid td[data-label]::before { content:attr(data-label); display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); margin-bottom:3px; }
-    table.grid td:first-child { position:absolute; left:10px; top:12px; width:28px; height:28px; padding:0; border-radius:50%; background:var(--accent-soft); color:var(--primary); font-weight:600; font-size:12px; display:flex; align-items:center; justify-content:center; }
-    table.grid td:has(> .x) { position:absolute; top:6px; right:6px; width:auto; padding:0; }
+    table.grid td:first-child { position:absolute; left:10px; top:12px; width:28px; height:28px; padding:0; border-radius:50%; background:var(--sage); color:var(--navy); font-weight:600; font-size:12px; display:flex; align-items:center; justify-content:center; }
+    table.grid.input-grid tbody tr.isi { border-left:3px solid var(--forest); padding-left:46px; }
+    table.grid.input-grid tbody tr.isi td:first-child { background:var(--forest); color:#fff; }
+    table.grid td.c-del { position:absolute; top:6px; right:6px; width:auto; padding:0; }
     table.grid td select, table.grid td input:not([type=checkbox]):not([type=number]) { width:100%; margin:3px 0; }
     table.grid td input[type=number] { width:96px; margin:3px 0; }
     table.grid td select + input, table.grid td input + input { margin-left:0; }
     table.grid td input[type=checkbox] { width:22px; height:22px; }
-    table.grid td[data-label="Periode sebelumnya"] { display:flex; gap:8px; align-items:baseline; font-size:13px; }
-    table.grid td[data-label="Periode sebelumnya"]::before { display:inline; margin:0; }
-    table.grid td[data-label="Posisi hafalan terakhir"] { display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; }
-    table.grid td[data-label="Posisi hafalan terakhir"]::before { width:100%; margin:0; }
-    table.grid td[data-label="Posisi hafalan terakhir"] select:first-of-type { width:100%; margin:0; }
-    table.grid td[data-label="Posisi hafalan terakhir"] select:not(:first-of-type) { flex:1 1 150px; width:auto; margin:0; }
-    table.grid td[data-label="Posisi hafalan terakhir"] input[type=number] { width:84px; margin:0; }
-    table.grid td[data-label="Catatan"]::before { display:none; }
-    table.grid td[data-label="Catatan"] input { margin:2px 0 0; min-height:40px; }
-    table.grid td[data-label="Santri"] { padding-right:36px; }
-    /* lembar cetak: cukup digeser, tetap format A4 */
-    .page { width:297mm; min-height:0; }
-    main { overflow-x:auto; }
+    table.grid td.c-prev { display:flex; gap:8px; align-items:baseline; font-size:13px; }
+    table.grid td.c-prev::before { display:inline; margin:0; }
+    table.grid td.c-pos { display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; }
+    table.grid td.c-pos::before { width:100%; margin:0; }
+    table.grid td.c-pos select:first-of-type { width:100%; margin:0; }
+    table.grid td.c-pos select:not(:first-of-type) { flex:1 1 150px; width:auto; margin:0; }
+    table.grid td.c-pos input[type=number] { width:84px; margin:0; }
+    table.grid td.c-note::before { display:none; }
+    table.grid td.c-note input { margin:2px 0 0; min-height:40px; }
+    table.grid td.c-name { padding-right:36px; }
+    .in-head { position:sticky; top:var(--stick-top); z-index:3; background:var(--surface); margin:-14px -14px 12px; padding:12px 14px 10px; border-bottom:1px solid var(--line-soft); border-radius:var(--radius) var(--radius) 0 0; }
+    .in-head h2 { font-size:15.5px; }
+
+    table.kv, table.kv tbody, table.kv tr, table.kv td { display:block; width:100%; }
+    table.kv td:first-child { width:100%; padding:10px 0 4px; border-bottom:0; font-size:13px; }
+    table.kv td:last-child { padding:0 0 10px; }
+
+    /* lembar A4: diperkecil agar muat selebar layar (lihat fitSheets); cetak tetap 1:1 */
+    .page { margin-bottom:12px; }
+
+    /* Ringkasan */
+    .rk-head { padding-top:0; margin-bottom:14px; padding-bottom:14px; }
+    .rk-title { font-size:24px; }
+    .rk-title::after { margin-top:8px; }
+    .rk-meta { font-size:13px; margin-top:8px; }
+    .rk-period { width:100%; }
+    .rk-period select { flex:1; min-width:0; }
+    .rk-chips { flex-wrap:nowrap; overflow-x:auto; margin:12px -12px 0; padding:0 12px 4px; scrollbar-width:none; }
+    .rk-chips::-webkit-scrollbar { display:none; }
+    .chip { min-height:38px; }
+    .rk-stats { grid-template-columns:1fr 1fr; margin-bottom:16px; }
+    .stat { padding:12px 14px; border-left:1px solid var(--line-soft); border-top:1px solid var(--line-soft); }
+    .stat:nth-child(odd) { border-left:0; }
+    .stat:nth-child(-n+2) { border-top:0; }
+    .stat:nth-child(4) { border-left:1px solid var(--line-soft); }
+    .stat:last-child:nth-child(odd) { grid-column:1 / -1; }
+    .stat .v { font-size:22px; }
+    .rk-att { padding:14px; margin-bottom:20px; }
+    .rk-att-h h2 { font-size:18px; }
+    .att-grid { grid-template-columns:1fr; gap:10px; }
+    .att li { padding:7px 0; }
+    .att button.nm { min-height:28px; }
+    table.rk { display:none; }
+    .rk-cards { display:block; }
+    .grp-row.h { display:none; }
+    .grp-row { grid-template-columns:1fr 1fr; gap:6px 12px; padding:12px 14px; }
+    .grp-row .g { grid-column:1 / -1; font-size:15px; }
+    .grp-row .k { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
+    .grp-row .fl-col { display:block; grid-column:1 / -1; }
+    .grp-row .go { grid-column:1 / -1; }
+    .grp-row .go .btn { width:100%; justify-content:center; }
+    .chartbox { margin:0 -12px; border-radius:0; border-left:0; border-right:0; }
   }
 
-  /* ---------- Cetak A4 mendatar (dipertahankan) ---------- */
+  /* ---------- Cetak A4 mendatar (lembar saja, latar putih) ---------- */
   @media print {
     @page { size:A4 landscape; margin:0; }
     body { background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     nav, .toolbar, .noprint { display:none !important; }
+    /* label sinkron kehilangan kelas noprint saat updateSyncStat mengganti className; sembunyikan langsung lewat ID */
+    #msync, #savestat, #mhead, #sfoot, #totop { display:none !important; }
     main { padding:0; max-width:none; }
+    .sheets { zoom:1 !important; }
     .page { box-shadow:none; border:0; border-radius:0; margin:0; width:297mm; min-height:210mm; height:auto; }
     svg.chart { border:0; background:#fff; }
     table.sheet td.cell { transition:none; }
@@ -281,11 +547,12 @@
 <header id="mhead" class="noprint"><img id="mheadlogo" alt="" src=""><span class="mtitle">Monitoring Hafalan Santri</span><span id="mrole"></span><button id="mlogout" class="linkbtn" onclick="logout()">Keluar</button></header>
 <div id="msync" class="sync noprint"></div>
 <nav>
-  <span class="brand"><img id="brandlogo" class="logo" alt="Logo Ketahfidhan PTQ" src="">Monitoring Hafalan Santri</span>
-  <button data-tab="input"><span class="lf">Input Setoran</span><span class="ls">Input</span></button>
-  <button data-tab="lembar"><span class="lf">Lembar Perkembangan</span><span class="ls">Lembar</span></button>
-  <button data-tab="santri"><span class="lf">Data Santri</span><span class="ls">Santri</span></button>
-  <button data-tab="atur"><span class="lf">Pengaturan &amp; Cadangan</span><span class="ls">Pengaturan</span></button>
+  <span class="brand"><img id="brandlogo" class="logo" alt="Logo Ketahfidhan PTQ" src=""><span class="bt">Monitoring Hafalan Santri</span></span>
+  <button data-tab="ringkasan"><span class="ni" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span><span class="lf">Ringkasan</span><span class="ls">Ringkasan</span></button>
+  <button data-tab="input"><span class="ni" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></span><span class="lf">Input Setoran</span><span class="ls">Input</span></button>
+  <button data-tab="lembar"><span class="ni" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span><span class="lf">Lembar Perkembangan</span><span class="ls">Lembar</span></button>
+  <button data-tab="santri"><span class="ni" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg></span><span class="lf">Data Santri</span><span class="ls">Santri</span></button>
+  <button data-tab="atur"><span class="ni" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><span class="lf">Pengaturan &amp; Cadangan</span><span class="ls">Pengaturan</span></button>
   <span style="flex:1"></span>
   <span id="rolebadge"></span>
   <span class="small muted" id="savestat"></span>
@@ -378,7 +645,7 @@ async function login(r){
     const rr=jwtPayload(j.access_token).app_metadata?.role;
     if(rr!==(ro?r+"_r":r)) throw new Error(rr ? "Akun ini bukan untuk peran "+ROLES[r]+"." : "Akun belum diberi peran. Hubungi bagian ketahfidhan.");
     setAuth({access_token:j.access_token, refresh_token:j.refresh_token, expires_at:Math.floor(Date.now()/1000)+j.expires_in, role:r, readOnly:ro}); role=r; readOnly=ro;
-    const g=visibleGroups(); if(!g.some(x=>x.key===ui.group)) ui.group=g[0].key; ui.lembarGroup="semua"; tab=(isAdmin()&&!readOnly)?"input":"lembar";
+    const g=visibleGroups(); if(!g.some(x=>x.key===ui.group)) ui.group=g[0].key; ui.lembarGroup="semua"; ui.rGroup="semua"; ui.rPeriode=null; tab="ringkasan";
     state=defaultState(); save(); renderAll(); await syncPull();
   }catch(e){
     m.textContent = e.status===400 ? "PIN salah untuk "+ROLES[r]+"." : (e instanceof TypeError ? "Tidak ada koneksi internet. Masuk membutuhkan internet." : e.message);
@@ -497,8 +764,8 @@ document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState=
 /* ================= STATE & PENYIMPANAN ================= */
 const KEY = "monitoringHafalan.v1";
 let state;
-let tab = "input";
-let ui = { periode:null, group:"Pa-1", lembarGroup:"semua", grafik:false };
+let tab = "ringkasan";
+let ui = { periode:null, group:"Pa-1", lembarGroup:"semua", grafik:false, rPeriode:null, rGroup:"semua" };
 
 function defaultState(){
   return {
@@ -537,11 +804,12 @@ function labelEntry(e, html=true){
 }
 function cellColor(p){
   // Heatmap setoran: p = capaian terhadap juz target (0..1, bisa >1 bila melampaui)
-  if(p==null) return {bg:"#ffffff", fg:"#1e293b"};              // belum ada setoran
-  if(p<=0)    return {bg:"#f8fafc", fg:"#64748b"};              // masih di bawah awal juz target
-  if(p<=0.30) return {bg:"rgba(16,185,129,0.15)", fg:"#1e293b"}; // 1–30 %
-  if(p<=0.70) return {bg:"rgba(16,185,129,0.40)", fg:"#1e293b"}; // 31–70 %
-  return {bg:"rgba(16,185,129,0.85)", fg:"#ffffff"};            // 71–100 % / tuntas
+  // warna forest transparan di atas putih: hemat tinta, tetap terbaca saat difotokopi
+  if(p==null) return {bg:"#ffffff", fg:"#1B2A41"};               // belum ada setoran
+  if(p<=0)    return {bg:"#F6F7F4", fg:"#4A5A73"};               // masih di bawah awal juz target
+  if(p<=0.30) return {bg:"rgba(30,91,63,0.13)", fg:"#1B2A41"};   // 1–30 %
+  if(p<=0.70) return {bg:"rgba(30,91,63,0.38)", fg:"#1B2A41"};   // 31–70 %
+  return {bg:"rgba(30,91,63,0.88)", fg:"#ffffff"};               // 71–100 % / tuntas
 }
 function santriGroup(s){ return GROUPS.find(g=>g.pp===s.pp && g.kelas.includes(s.kelas)); }
 function targetJuz(s){ return s.targetJuz || TARGET_DEFAULT[s.kelas] || 30; }
@@ -557,12 +825,215 @@ function render(){
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
   const app=document.getElementById("app");
   if(readOnly && (tab==="input"||tab==="santri")) tab="lembar";
-  if(tab==="input") app.innerHTML=viewInput();
+  if(tab==="ringkasan") app.innerHTML=viewRingkasan();
+  else if(tab==="input") app.innerHTML=viewInput();
   else if(tab==="lembar") app.innerHTML=viewLembar();
   else if(tab==="santri") app.innerHTML=viewSantri();
   else app.innerHTML=viewAtur();
+  if(tab==="lembar") fitSheets();
 }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; render(); });
+
+/* ---------- Tab Ringkasan (dasbor pemantauan) ----------
+   Semua angka memakai rumus yang sama dengan Lembar Perkembangan:
+   kacaTotal, latestEntry, firstEntry, progress, rankList.
+   Tidak ada permintaan data tambahan ke server. */
+const sameMode = (a,b) => (a.mode||"juz")===(b.mode||"juz");
+// Dua catatan bisa dibandingkan bila cara catatnya sama, atau bila catatan juz/kaca berada di luar juz 30.
+// Konversi surat/ayat ke kaca hanya perkiraan di dalam juz 30, sedangkan posisi juz 1 dst. pasti di atas akhir juz 30 (23 kaca).
+const comparable = (a,b) => sameMode(a,b) || +((a.mode==="surat"?b:a).juz)!==30;
+const fmtSigned = v => (v>0?"+":v<0?"−":"")+fmtN(Math.abs(v));
+// Status satu santri pada periode acuan, dibanding periode tepat sebelumnya.
+// "belum"  : tidak ada catatan posisi di periode acuan.
+// "tetap"  : posisi sama persis dengan periode sebelumnya (cara catat sama).
+// "turun"  : posisi lebih rendah dari periode sebelumnya (cara catat sama) -> kemungkinan salah input.
+// "naik"   : posisi bertambah.
+// Tidak dibandingkan: periode pertama, periode sebelumnya kosong, atau cara catat berganti
+// antara surat/ayat dan juz 30 kaca (konversi perkiraan sehingga selisihnya tidak bisa dipercaya).
+function statusPeriode(sid, pi){
+  const cur=entry(sid,pi), kc=kacaTotal(cur);
+  if(kc==null) return {k:"belum"};
+  if(pi===0) return {k:"awal"};
+  const prev=entry(sid,pi-1), kp=kacaTotal(prev);
+  if(kp==null) return {k:"tanpa-banding"};
+  if(!comparable(prev,cur)) return {k:"beda-cara"};
+  const d=kc-kp;
+  if(Math.abs(d)<1e-6) return {k:"tetap", d:0, prev, cur};
+  return {k:d<0?"turun":"naik", d, prev, cur};
+}
+function infoSantri(s, pi, ps){
+  const le=latestEntry(s.id), fe=firstEntry(s.id), tj=targetJuz(s);
+  const total = le ? kacaTotal(le.e) : null;
+  const vals = ps.map(p=>kacaTotal(entry(s.id,p.i)));
+  const nCat = vals.filter(v=>v!=null).length;
+  const add = (total!=null && fe) ? total-kacaTotal(fe.e) : null;   // sama dengan kolom "Tambah smt ini" di Lembar
+  const pr = le ? progress(le.e,tj) : null;                          // sama dengan kolom "Capaian target" di Lembar
+  return {s, le, fe, tj, total, vals, nCat, add, pr, done: pr!=null && pr>=1, st: statusPeriode(s.id,pi), g: santriGroup(s)};
+}
+function statsOf(infos){
+  const dua=infos.filter(x=>x.nCat>=2 && x.add!=null);               // tambahan hanya bermakna bila ada ≥2 catatan
+  const totAdd=dua.reduce((a,x)=>a+x.add,0);
+  return { n:infos.length,
+    tercatat:infos.filter(x=>x.st.k!=="belum").length,
+    catatan:infos.reduce((a,x)=>a+x.nCat,0),
+    nDua:dua.length, totAdd, avg: dua.length ? totAdd/dua.length : null,
+    tuntas:infos.filter(x=>x.done).length };
+}
+function shortLabel(g){ const k = g.kelas.length>1 ? "Intensif & 5" : "Kelas "+g.kelas[0]; return isAdmin() ? (g.pp==="Pa"?"Putra":"Putri")+" · "+k : k; }
+function spark(vals){
+  const pts=vals.map((v,i)=>v==null?null:[i,v]).filter(Boolean);
+  if(pts.length<2) return `<span class="muted small">—</span>`;
+  const W=96,H=24,p=3, n=Math.max(1,vals.length-1);
+  const mn=Math.min(...pts.map(q=>q[1])), mx=Math.max(...pts.map(q=>q[1])), rg=(mx-mn)||1;
+  const X=i=>p+(W-2*p)*i/n, Y=v=> mx===mn ? H/2 : H-p-(H-2*p)*(v-mn)/rg;
+  const d=pts.map((q,k)=>(k?"L":"M")+X(q[0]).toFixed(1)+","+Y(q[1]).toFixed(1)).join(" ");
+  const a=pts[pts.length-1], b=pts[pts.length-2];
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Tren posisi hafalan"><path class="sl" d="${d}"/><circle class="${a[1]<b[1]?"sdn":"sd"}" cx="${X(a[0]).toFixed(1)}" cy="${Y(a[1]).toFixed(1)}" r="2.6"/></svg>`;
+}
+function stChip(st){
+  switch(st.k){
+    case "naik":  return `<span class="st naik">+${fmtN(st.d)} kaca</span>`;
+    case "tetap": return `<span class="st tetap">Tetap</span>`;
+    case "turun": return `<span class="st turun">Lebih rendah</span>`;
+    case "belum": return `<span class="st belum">Belum dicatat</span>`;
+    case "awal":  return `<span class="st na">Catatan pertama</span>`;
+    case "beda-cara": return `<span class="st na" title="Cara catat berganti (surat/ayat dan juz/kaca), tidak dibandingkan">Tercatat</span>`;
+    default: return `<span class="st na" title="Periode sebelumnya kosong, tidak dibandingkan">Tercatat</span>`;
+  }
+}
+function pbar(x){
+  if(x.pr==null) return `<span class="muted small">—</span>`;
+  const pct=Math.round(x.pr*100), w=Math.max(0,Math.min(100,pct));
+  return `<div class="pbar"><span class="tr"><i style="width:${w}%"></i></span><span class="pc">${pct}%</span>${x.done?`<span class="mile">Tuntas Juz ${x.tj}</span>`:`<span class="tj">Juz ${x.tj}</span>`}</div>`;
+}
+function histHtml(x, ps){
+  return `<div class="hist">`+ps.map(p=>{
+    const e=entry(x.s.id,p.i), v=x.vals[p.i]; let dl="";
+    if(v!=null && p.i>0){ const pe=entry(x.s.id,p.i-1), pv=x.vals[p.i-1];
+      if(pv!=null && comparable(pe,e)){ const d=v-pv; dl = Math.abs(d)<1e-6 ? `<span class="dl eq">tetap</span>` : d>0 ? `<span class="dl up">+${fmtN(d)} kaca</span>` : `<span class="dl dn">−${fmtN(-d)} kaca</span>`; }
+      else if(pv!=null) dl=`<span class="dl na">cara catat berganti</span>`; }
+    return `<div class="h"><div class="p">P${p.i+1} · ${fmtD(p.date)}</div><div class="e${v==null?" kosong":""}">${v==null?"—":esc(labelEntry(e,false))}</div>${dl?`<div>${dl}</div>`:""}${e&&e.catatan?`<div class="p">${esc(e.catatan)}</div>`:""}</div>`;
+  }).join("")+`</div>`;
+}
+function rkToggle(btn, id){ const r=document.getElementById("det-"+id); if(!r) return; const open=r.hidden; r.hidden=!open; btn.setAttribute("aria-expanded", open); btn.textContent=open?"Tutup":"Rincian"; }
+function bukaInput(sid, pi){
+  if(readOnly) return; const s=state.santri.find(x=>x.id===sid); const g=s&&santriGroup(s); if(!g) return;
+  ui.group=g.key; ui.periode=pi; tab="input"; render();
+  const tr=document.getElementById("row-"+sid);
+  if(tr){ tr.scrollIntoView({block:"center", behavior:"smooth"}); tr.classList.add("flash"); setTimeout(()=>tr.classList.remove("flash"),1700); }
+}
+function viewRingkasan(){
+  const ps=periods(); const P=state.pengaturan; if(!ps.length) return `<div class="empty">Atur periode di tab Pengaturan.</div>`;
+  if(ui.rPeriode==null || ui.rPeriode>=ps.length) ui.rPeriode=Math.min(periodeTerkini(), ps.length-1);
+  const pi=ui.rPeriode; const today=new Date(); today.setHours(0,0,0,0);
+  const vg=visibleGroups().filter(g=>state.santri.some(s=>s.aktif!==false && santriGroup(s)?.key===g.key));
+  if(!vg.length) return `<div class="empty">Belum ada santri aktif.${readOnly?"":" Tambahkan lewat tab Data Santri."}</div>`;
+  if(ui.rGroup!=="semua" && !vg.some(g=>g.key===ui.rGroup)) ui.rGroup="semua";
+  const semua = ui.rGroup==="semua";
+  const groups = semua ? vg : vg.filter(g=>g.key===ui.rGroup);
+  const perG = groups.map(g=>({g, infos: rankList(g).map(r=>infoSantri(r.s,pi,ps))}));
+  const infos = perG.flatMap(x=>x.infos);
+  const st=statsOf(infos);
+  const pDate=ps[pi].date, future=pDate>today;
+  const title = semua ? (isAdmin() ? "Semua kelompok" : (role==="Pa"?"Marhalah Putra":"Marhalah Putri")) : groups[0].label;
+  const targets=[...new Set(infos.map(x=>x.tj))].sort((a,b)=>(a===30?0:a)-(b===30?0:b));
+  const PL=i=>`Periode ${i+1}`;
+
+  /* 1. Konteks kelompok & semester */
+  const head = `<section class="rk-head">
+    <div class="rk-eyebrow">Ringkasan · ${esc(P.semester)}</div>
+    <div class="rk-titlerow"><h1 class="rk-title">${esc(title)}</h1>
+      <label class="rk-period">Periode acuan <select onchange="ui.rPeriode=+this.value;render()">${ps.map(p=>`<option value="${p.i}" ${p.i===pi?"selected":""}>${PL(p.i)} · ${fmtDL(p.date)}${p.date>today?" (belum tiba)":""}</option>`).join("")}</select></label></div>
+    <div class="rk-meta"><b>${PL(pi)}</b> · ${fmtDL(pDate)}${future?" · belum tiba":""} &nbsp;·&nbsp; Target Juz ${targets.join(", ")} &nbsp;·&nbsp; ${st.n} santri aktif</div>
+    <div class="rk-chips" role="group" aria-label="Pilih kelompok">${[["semua","Semua"],...vg.map(g=>[g.key,shortLabel(g)])].map(([k,l])=>`<button type="button" class="chip${ui.rGroup===k?" on":""}" aria-pressed="${ui.rGroup===k}" onclick="ui.rGroup='${k}';render()">${l}</button>`).join("")}</div>
+  </section>`;
+
+  /* 2. Angka ringkas (label sesuai rumus yang dipakai) */
+  const stats = `<section class="rk-stats" aria-label="Angka ringkas">
+    <div class="stat"><div class="lb">Tercatat ${PL(pi)}</div><div class="v">${st.tercatat}<small>dari ${st.n} santri</small></div><div class="d">santri dengan catatan posisi di periode ini</div></div>
+    <div class="stat"><div class="lb">Catatan semester</div><div class="v">${st.catatan}<small>catatan</small></div><div class="d">jumlah catatan setoran P1 sampai P${ps.length}</div></div>
+    <div class="stat"><div class="lb">Total tambahan</div><div class="v">${st.nDua?fmtSigned(st.totAdd):"—"}<small>kaca</small></div><div class="d">posisi terakhir dikurangi catatan pertama, ${st.nDua} santri</div></div>
+    <div class="stat"><div class="lb">Rata-rata tambahan</div><div class="v">${st.avg==null?"—":fmtSigned(st.avg)}<small>kaca/santri</small></div><div class="d">dari ${st.nDua} santri yang punya ≥ 2 catatan</div></div>
+    <div class="stat milestone"><div class="lb">Mencapai target</div><div class="v">${st.tuntas}<small>dari ${st.n} santri</small></div><div class="d">posisi terakhir ≥ 100% juz target</div></div>
+  </section>`;
+
+  /* 3. Perlu perhatian: tiga kondisi yang dibedakan tegas */
+  const nameEl = x => readOnly ? `<span class="nm">${esc(x.s.nama)}</span>` : `<button type="button" class="nm" title="Buka di Input Setoran" onclick="bukaInput('${x.s.id}',${pi})">${esc(x.s.nama)}</button>`;
+  const grpTag = x => semua && x.g ? shortLabel(x.g)+" · " : "";
+  const byName = (a,b)=>(a.g?.key||"").localeCompare(b.g?.key||"") || a.s.nama.localeCompare(b.s.nama);
+  const belum=infos.filter(x=>x.st.k==="belum").sort(byName), tetap=infos.filter(x=>x.st.k==="tetap").sort(byName), turun=infos.filter(x=>x.st.k==="turun").sort(byName);
+  const tanpa=infos.filter(x=>x.st.k==="tanpa-banding").length, beda=infos.filter(x=>x.st.k==="beda-cara").length;
+  const list = (arr, ex) => arr.length ? `<ul>${arr.map(x=>`<li>${nameEl(x)}<span class="ex">${ex(x)}</span></li>`).join("")}</ul>` : `<div class="none">Tidak ada.</div>`;
+  const blkBelum = `<div class="att t-belum"><div class="att-t"><span class="n">${belum.length}</span>Belum dicatat</div>
+      <div class="att-d">Belum ada catatan posisi untuk ${PL(pi)}${future?" (periode belum tiba)":""}.</div>
+      ${belum.length===st.n && st.n>3 ? `<div class="none">Belum ada catatan sama sekali untuk periode ini.</div>` : list(belum, x=>grpTag(x)+(x.le?`terakhir P${x.le.i+1}`:"belum pernah dicatat"))}</div>`;
+  const noCmp = `<div class="none">Periode pertama, belum ada pembanding.</div>`;
+  const blkTetap = `<div class="att t-tetap"><div class="att-t"><span class="n">${pi?tetap.length:"–"}</span>Posisi tetap</div>
+      <div class="att-d">${pi?`Posisi sama persis dengan ${PL(pi-1)}.`:"Membandingkan dengan periode sebelumnya."}</div>
+      ${pi ? list(tetap, x=>grpTag(x)+esc(labelEntry(x.st.cur,false))) : noCmp}</div>`;
+  const blkTurun = `<div class="att t-turun"><div class="att-t"><span class="n">${pi?turun.length:"–"}</span>Lebih rendah</div>
+      <div class="att-d">${pi?`Posisi lebih rendah dari ${PL(pi-1)}. Kemungkinan salah input, mohon diperiksa.`:"Membandingkan dengan periode sebelumnya."}</div>
+      ${pi ? list(turun, x=>grpTag(x)+esc(labelEntry(x.st.prev,false))+" menjadi "+esc(labelEntry(x.st.cur,false))) : noCmp}</div>`;
+  const notes=[];
+  if(tanpa) notes.push(`${tanpa} santri tidak dibandingkan karena ${PL(pi-1)} kosong`);
+  if(beda) notes.push(`${beda} santri tidak dibandingkan karena cara catat berganti antara surat/ayat dan kaca di juz 30`);
+  const clear = !belum.length && (!pi || (!tetap.length && !turun.length));
+  const att = `<section class="rk-att" aria-labelledby="att-h">
+    <div class="rk-att-h"><h2 id="att-h">Perlu perhatian</h2><span class="muted">${pi?`${PL(pi)} (${fmtD(pDate)}) dibanding ${PL(pi-1)} (${fmtD(ps[pi-1].date)})`:`${PL(pi)} (${fmtD(pDate)})`}</span></div>
+    ${clear ? `<div class="att-ok">Semua santri sudah dicatat${pi?" dan posisinya bertambah dari periode sebelumnya":""}.</div>` : `<div class="att-grid">${blkBelum}${blkTetap}${blkTurun}</div>`}
+    ${(notes.length || (!readOnly && !clear)) ? `<div class="att-note">${notes.map(n=>n+".").join(" ")}${!readOnly && !clear ? `${notes.length?" ":""}Ketuk nama untuk membuka Input Setoran ${PL(pi)}.`:""}</div>` : ""}
+  </section>`;
+
+  /* 4. Perkembangan santri */
+  let body="";
+  if(semua){
+    const rows = perG.map(({g,infos:gi})=>{ const s2=statsOf(gi);
+      const nB=gi.filter(x=>x.st.k==="belum").length, nT=pi?gi.filter(x=>x.st.k==="tetap").length:0, nR=pi?gi.filter(x=>x.st.k==="turun").length:0;
+      const fl=[nB?`<span class="st belum">${nB} belum</span>`:"", nT?`<span class="st tetap">${nT} tetap</span>`:"", nR?`<span class="st turun">${nR} lebih rendah</span>`:""].join("") || `<span class="st naik">Lengkap</span>`;
+      return `<div class="grp-row"><div class="g">${esc(g.label)}</div>
+        <div class="num"><span class="k">Santri aktif</span>${s2.n}</div>
+        <div class="num"><span class="k">Tercatat P${pi+1}</span>${s2.tercatat} <small>/ ${s2.n}</small></div>
+        <div class="num"><span class="k">Rata-rata tambahan</span>${s2.avg==null?"—":fmtSigned(s2.avg)+" <small>kaca</small>"}</div>
+        <div class="num"><span class="k">Mencapai target</span>${s2.tuntas} <small>/ ${s2.n}</small></div>
+        <div class="fl-col"><span class="k">Perlu perhatian</span><div class="fl">${fl}</div></div>
+        <div class="go"><button class="btn secondary" onclick="ui.rGroup='${g.key}';render();scrollTo({top:0})">Lihat santri</button></div></div>`; }).join("");
+    body = `<section class="rk-sec"><div class="rk-sec-h"><h2>Per kelompok</h2><span class="muted">Pilih kelompok untuk melihat perkembangan tiap santri dan grafiknya.</span></div>
+      <div class="grp"><div class="grp-row h"><div>Kelompok</div><div>Santri aktif</div><div>Tercatat P${pi+1}</div><div>Rata-rata tambahan</div><div>Mencapai target</div><div class="fl-col">Perlu perhatian</div><div></div></div>${rows}</div></section>`;
+  } else {
+    const g=groups[0], gi=perG[0].infos, multi=g.kelas.length>1;
+    const kls = x => multi ? (x.s.kelas==="Intensif"?"Intensif":"Kelas "+esc(x.s.kelas)) : "";
+    const pos = x => x.le ? `${esc(labelEntry(x.le.e,false))}<small>P${x.le.i+1}</small>` : `<span class="muted">—</span>`;
+    const addTxt = x => x.add==null || x.nCat<2 ? "—" : fmtSigned(x.add);
+    const trs = gi.map((x,i)=>`<tr class="main"><td><span class="rank${x.done?" done":""}">${i+1}</span></td>
+        <td class="nmc"><b>${esc(x.s.nama)}</b>${multi?`<span>${kls(x)}</span>`:""}</td>
+        <td class="pos">${pos(x)}</td><td class="c-tren">${spark(x.vals)}</td><td class="num">${addTxt(x)}</td>
+        <td>${pbar(x)}</td><td>${stChip(x.st)}</td>
+        <td><button type="button" class="detbtn" aria-expanded="false" aria-controls="det-${x.s.id}" onclick="rkToggle(this,'${x.s.id}')">Rincian</button></td></tr>
+      <tr class="det" id="det-${x.s.id}" hidden><td colspan="8">${histHtml(x,ps)}</td></tr>`).join("");
+    const cards = gi.map((x,i)=>`<div class="scard"><div class="top"><span class="rank${x.done?" done":""}">${i+1}</span>
+        <div class="nmc"><b>${esc(x.s.nama)}</b><span>${multi?kls(x)+" · ":""}Target Juz ${x.tj}</span></div>${stChip(x.st)}</div>
+        <div class="row2"><div><div class="k">Posisi terakhir</div><div class="val">${x.le?esc(labelEntry(x.le.e,false))+` <span class="muted small">P${x.le.i+1}</span>`:"—"}</div></div>
+          <div class="r"><div class="k">Tambah semester</div><div class="val">${addTxt(x)}${x.add!=null&&x.nCat>=2?` <span class="muted small">kaca</span>`:""}</div></div></div>
+        ${pbar(x)}
+        <details><summary>Riwayat per periode</summary>${histHtml(x,ps)}</details></div>`).join("");
+    body = `<section class="rk-sec"><div class="rk-sec-h"><h2>Perkembangan santri</h2><span class="muted">Urut dari hafalan terbanyak, sama seperti Lembar Perkembangan.</span></div>
+      <table class="rk"><thead><tr><th>#</th><th>Santri</th><th>Posisi terakhir</th><th class="c-tren">Tren</th><th class="num">Tambah smt</th><th>Capaian target</th><th>${PL(pi)}</th><th></th></tr></thead><tbody>${trs}</tbody></table>
+      <div class="rk-cards">${cards}</div></section>`;
+    /* 5. Grafik pertambahan */
+    const svg=chartSvg(g, rankList(g));
+    body += `<section class="rk-sec minor"><div class="rk-sec-h"><h2>Grafik pertambahan hafalan</h2><span class="muted">Pertambahan kaca sejak catatan pertama tiap santri. Nomor mengikuti urutan tabel.</span></div>
+      ${svg?`<div class="chartbox">${svg}</div>`:`<div class="empty">Belum ada catatan.</div>`}</section>`;
+  }
+  const foot = `<p class="rk-foot">Angka dihitung dengan rumus yang sama seperti Lembar Perkembangan. Tambahan adalah posisi terakhir dikurangi catatan pertama semester ini, dan hanya dihitung untuk santri yang punya minimal dua catatan. Catatan per surat dan ayat dikonversi ke perkiraan kaca (${TOTAL_AYAT_30} ayat juz 30 ≈ 23 kaca).</p>`;
+  return head + stats + att + body + foot;
+}
+/* Lembar A4 diperkecil agar muat selebar layar. Hanya tampilan layar: saat mencetak, zoom dikembalikan ke 1 oleh CSS. */
+function fitSheets(){
+  const el=document.getElementById("sheets"); if(!el) return; el.style.zoom="";
+  const pg=el.querySelector(".page"), par=el.parentElement; if(!pg||!par) return;
+  const cs=getComputedStyle(par); const avail=par.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const z=Math.min(1, avail/pg.offsetWidth); if(z<0.995) el.style.zoom=z.toFixed(3);
+}
 
 /* ---------- Tab Input ---------- */
 function viewInput(){
@@ -581,12 +1052,13 @@ function viewInput(){
       fields = `juz <input type="number" min="1" max="30" value="${e.juz??""}" oninput="setE('${s.id}','juz',this.value)">
         kaca <input type="number" min="1" max="23" value="${e.kaca??""}" oninput="setE('${s.id}','kaca',this.value)">`;
     }
-    return `<tr><td>${idx+1}</td><td data-label="Santri"><b>${esc(s.nama)}</b><br><span class="small muted">target juz ${targetJuz(s)}</span></td>
-      <td class="muted" data-label="Periode sebelumnya">${labelEntry(prev,false) || "—"}</td>
-      <td data-label="Posisi hafalan terakhir"><select onchange="setE('${s.id}','mode',this.value);render()"><option value="juz" ${mode==="juz"?"selected":""}>Juz / Kaca</option><option value="surat" ${mode==="surat"?"selected":""}>Surat / Ayat</option></select> ${fields}</td>
-      <td data-label="Catatan"><input style="width:100%" placeholder="catatan" value="${esc(e.catatan||"")}" oninput="setE('${s.id}','catatan',this.value)"></td>
-      <td><button class="x" title="Kosongkan" onclick="clearE('${s.id}')">✕</button></td></tr>`;
+    return `<tr id="row-${s.id}" class="${kacaTotal(e)!=null?"isi":""}"><td>${idx+1}</td><td class="c-name" data-label="Santri"><b>${esc(s.nama)}</b><br><span class="small muted">target juz ${targetJuz(s)}</span></td>
+      <td class="muted c-prev" data-label="Periode sebelumnya">${labelEntry(prev,false) || "—"}</td>
+      <td class="c-pos" data-label="Posisi hafalan terakhir"><select onchange="setE('${s.id}','mode',this.value);render()"><option value="juz" ${mode==="juz"?"selected":""}>Juz / Kaca</option><option value="surat" ${mode==="surat"?"selected":""}>Surat / Ayat</option></select> ${fields}</td>
+      <td class="c-note" data-label="Catatan"><input class="wide" placeholder="catatan" value="${esc(e.catatan||"")}" oninput="setE('${s.id}','catatan',this.value)"></td>
+      <td class="c-del"><button class="x" title="Kosongkan" onclick="clearE('${s.id}')">✕</button></td></tr>`;
   }).join("");
+  const nIsi=list.filter(s=>kacaTotal(entry(s.id,ui.periode))!=null).length;
   return `<div class="toolbar">
     <label>Periode <select onchange="ui.periode=+this.value;render()">${ps.map(p=>`<option value="${p.i}" ${p.i===ui.periode?"selected":""}>Periode ${p.i+1} · ${fmtDL(p.date)}</option>`).join("")}</select></label>
     <label>Kelompok <select onchange="ui.group=this.value;render()">${visibleGroups().map(x=>`<option value="${x.key}" ${x.key===ui.group?"selected":""}>${x.label}</option>`).join("")}</select></label>
@@ -594,8 +1066,8 @@ function viewInput(){
     <span class="muted small">Perubahan tersimpan otomatis.</span>
   </div>
   <div class="card">
-    <h2>${g.label} — Periode ${ui.periode+1} (${fmtDL(ps[ui.periode].date)})</h2>
-    ${list.length? `<table class="grid"><thead><tr><th>#</th><th>Santri</th><th>Periode sebelumnya</th><th>Posisi hafalan terakhir (ziyadah)</th><th>Catatan</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty">Belum ada santri di kelompok ini. Tambahkan lewat tab Data Santri.</div>`}
+    <div class="in-head"><h2>${g.label} — Periode ${ui.periode+1} (${fmtDL(ps[ui.periode].date)})</h2>${list.length?`<span class="count" id="in-count" aria-live="polite"><b>${nIsi}</b> dari ${list.length} santri terisi</span>`:""}</div>
+    ${list.length? `<table class="grid input-grid"><thead><tr><th>#</th><th>Santri</th><th>Periode sebelumnya</th><th>Posisi hafalan terakhir (ziyadah)</th><th>Catatan</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty">Belum ada santri di kelompok ini. Tambahkan lewat tab Data Santri.</div>`}
   </div>`;
 }
 function setE(sid, f, v){
@@ -608,6 +1080,14 @@ function setE(sid, f, v){
   if(e.mode==="juz" && e.juz && e.kaca){ const mx=juzLen(e.juz); if(e.kaca>mx) e.kaca=mx; }
   if(e.mode==="surat" && e.surat && e.ayat){ const s=SURAH.find(x=>x[0]===+e.surat); if(s && e.ayat>s[2]) e.ayat=s[2]; }
   state.setoran[sid][ui.periode]=e; save(); queue({t:"setoran",k:sid+"|"+ui.periode,a:"upsert",row:rowSetoran(sid,ui.periode,e)});
+  updInputStatus(sid);
+}
+// Hanya memperbarui penanda & penghitung (tanpa render ulang) agar kursor tidak berpindah saat mengetik
+function updInputStatus(sid){
+  const tr=document.getElementById("row-"+sid); if(tr) tr.classList.toggle("isi", kacaTotal(entry(sid,ui.periode))!=null);
+  const c=document.getElementById("in-count"); if(!c) return;
+  const g=GROUPS.find(x=>x.key===ui.group); const list=state.santri.filter(s=>s.aktif!==false && santriGroup(s)?.key===g.key);
+  c.innerHTML=`<b>${list.filter(s=>kacaTotal(entry(s.id,ui.periode))!=null).length}</b> dari ${list.length} santri terisi`;
 }
 function clearE(sid){ if(state.setoran[sid]){ delete state.setoran[sid][ui.periode]; save(); queue({t:"setoran",k:sid+"|"+ui.periode,a:"delete",row:{santri_id:sid,periode:ui.periode}}); render(); } }
 function copyPrev(){
@@ -630,7 +1110,7 @@ function viewLembar(){
     <button class="btn" onclick="window.print()">Cetak / Simpan PDF</button>
     <span class="muted small">Di dialog cetak pilih printer "Save as PDF" untuk mengunduh. Ukuran A4 mendatar.</span>
   </div>
-  ${pages || `<div class="empty">Belum ada santri aktif.</div>`}`;
+  ${pages ? `<div class="sheets" id="sheets">${pages}</div>` : `<div class="empty">Belum ada santri aktif.</div>`}`;
 }
 function rankList(g){
   const list=state.santri.filter(s=>s.aktif!==false && santriGroup(s)?.key===g.key);
@@ -648,8 +1128,8 @@ function pageFor(g){
       return `<td class="cell ${done?"done":""}" style="background:${c.bg};color:${c.fg}">${labelEntry(e)}</td>`; }).join("");
     const fe=firstEntry(r.s.id); const add = (r.total!=null && fe) ? r.total - kacaTotal(fe.e) : null;
     const pr = r.le ? progress(r.le.e,tj) : null; const pct = pr==null? null : Math.round(pr*100);
-    const bar = pr==null ? "" : `<div class="bar"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i><b style="color:${pct>=55?'#fff':'#1f2a24'}">${pct}% juz ${tj}</b></div>`;
-    return `<tr><td class="no">${idx+1}</td><td class="nm${r.s.nama.length>26?" long":""}">${esc(r.s.nama)}${g.kelas.length>1?` <span style="font-weight:400;color:#6b776f">(${r.s.kelas==="Intensif"?"Int":esc(r.s.kelas)})</span>`:""}</td>${cells}
+    const bar = pr==null ? "" : `<div class="bar"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i><b style="color:${pct>=55?'#fff':'#1B2A41'}">${pct}% juz ${tj}</b></div>`;
+    return `<tr><td class="no">${idx+1}</td><td class="nm${r.s.nama.length>26?" long":""}">${esc(r.s.nama)}${g.kelas.length>1?` <span class="kls">(${r.s.kelas==="Intensif"?"Int":esc(r.s.kelas)})</span>`:""}</td>${cells}
       <td class="sum">${r.total==null?"":fmtN(r.total)}</td><td class="sum">${add==null?"":"+"+fmtN(add)}</td><td class="sum">${bar}</td></tr>`;
   });
   const tahap = [0,.25,.5,.75,1].map(q=>`<i style="background:${cellColor(q).bg}"></i>`).join("");
@@ -675,7 +1155,7 @@ function pageFor(g){
   return html + (ui.grafik ? chartPage(g, ranked) : "");
 }
 
-function chartPage(g, ranked){
+function chartSvg(g, ranked){
   const ps=periods(); const P=state.pengaturan; const W=1000,H=440,L=70,R=215,T=20,B=40;
   const withData = ranked.filter(r=>r.total!=null); if(!withData.length) return "";
   // nilai = pertambahan kaca sejak catatan pertama santri itu di semester ini (semua mulai dari 0)
@@ -687,7 +1167,7 @@ function chartPage(g, ranked){
   const x=i=>L+(W-L-R)*i/Math.max(1,ps.length-1), y=v=>T+(H-T-B)*(1-(v-ymin)/(ymax-ymin));
   // Palet emerald–teal bertingkat: tetap satu nuansa tema, tapi tiap santri masih bisa dibedakan
   // 12 warna kontras (ramah cetak & buta warna); santri ke-13 dst. memakai warna yang sama dengan garis putus-putus
-  const PAL=["#1f77b4","#d62728","#2ca02c","#ff7f0e","#9467bd","#17becf","#8c564b","#e377c2","#bcbd22","#0f766e","#7f7f7f","#1a1a2e"];
+  const PAL=["#1f77b4","#d62728","#2ca02c","#ff7f0e","#9467bd","#17becf","#8c564b","#e377c2","#bcbd22","#1E5B3F","#7f7f7f","#1B2A41"];
   const DASH=["","7 4","2 3"]; // ke-1..12 utuh, ke-13..24 putus panjang, ke-25..36 titik-titik
   // Kurva halus (Catmull-Rom -> kubik Bezier) tanpa melewati batas antar titik
   const smoothPath = pts => { if(pts.length<2) return ""; let d=`M${pts[0][0]},${pts[0][1]}`;
@@ -722,6 +1202,10 @@ function chartPage(g, ranked){
     for(let i=0;i<labels.length;i++){ const lo=i===0?top:labels[i-1].y+GAP; if(labels[i].y<lo) labels[i].y=lo; } }
   labels.forEach(l=>{ svg+=`<line x1="${W-R+2}" x2="${W-R+22}" y1="${l.y.toFixed(1)}" y2="${l.y.toFixed(1)}" stroke="${l.col}" stroke-width="2.5"${l.dash?` stroke-dasharray="${l.dash}"`:""}/><text x="${W-R+27}" y="${(l.y+4).toFixed(1)}" class="series-label" style="font-size:${fsz}px" fill="${l.col}">${l.txt}</text>`; });
   svg+=dots+`</svg>`; // titik digambar paling akhir agar selalu di atas garis
+  return svg;
+}
+function chartPage(g, ranked){
+  const svg=chartSvg(g, ranked); if(!svg) return ""; const P=state.pengaturan;
   return `<div class="page"><div class="ph"><div class="left"><img class="plogo" src="${LOGO}" alt=""><div><div class="t1">${esc(P.namaPesantren)}</div><div class="t2">Grafik Perkembangan · ${g.label}</div><div class="t3">${esc(P.semester)}</div></div></div></div>${svg}
     <div class="pf"><div>Grafik menunjukkan pertambahan hafalan (kaca) sejak catatan pertama semester ini, sehingga laju tiap santri sebanding walau posisi hafalannya berbeda. Posisi hafalan lengkap ada di tabel. Nomor = urutan hafalan terbanyak.</div><div>Dicetak ${fmtDL(new Date())}</div></div></div>`;
 }
@@ -730,12 +1214,12 @@ function chartPage(g, ranked){
 function viewSantri(){
   const list=state.santri.filter(canSee).sort((a,b)=>(a.pp+a.kelas+a.nama).localeCompare(b.pp+b.kelas+b.nama));
   const rows=list.map((s,i)=>`<tr>
-    <td>${i+1}</td><td data-label="Nama"><input value="${esc(s.nama)}" style="width:100%" oninput="setS('${s.id}','nama',this.value)"></td>
+    <td>${i+1}</td><td class="c-name" data-label="Nama"><input class="wide" value="${esc(s.nama)}" oninput="setS('${s.id}','nama',this.value)"></td>
     <td data-label="Pa / Pi"><select ${isAdmin()?"":"disabled"} onchange="setS('${s.id}','pp',this.value)"><option ${s.pp==="Pa"?"selected":""}>Pa</option><option ${s.pp==="Pi"?"selected":""}>Pi</option></select></td>
     <td data-label="Kelas"><select onchange="setS('${s.id}','kelas',this.value);render()">${KELAS.map(k=>`<option ${s.kelas===k?"selected":""}>${k}</option>`).join("")}</select></td>
     <td data-label="Target juz khusus"><input type="number" min="1" max="30" value="${s.targetJuz||""}" placeholder="${TARGET_DEFAULT[s.kelas]}" oninput="setS('${s.id}','targetJuz',this.value)"> <span class="small muted">kosong = ikut kelas</span></td>
     <td data-label="Aktif"><input type="checkbox" ${s.aktif!==false?"checked":""} onchange="setS('${s.id}','aktif',this.checked)"></td>
-    <td><button class="x" onclick="delS('${s.id}')">✕</button></td></tr>`).join("");
+    <td class="c-del"><button class="x" onclick="delS('${s.id}')">✕</button></td></tr>`).join("");
   const ringkas = visibleGroups().map(g=>`${g.label}: <b>${state.santri.filter(s=>s.aktif!==false&&santriGroup(s)?.key===g.key).length}</b>`).join(" &nbsp;·&nbsp; ");
   return `<div class="card"><h2>Tambah santri</h2>
     <div class="toolbar"><input id="n-nama" placeholder="Nama lengkap" style="width:260px"> ${isAdmin()?`<select id="n-pp"><option>Pa</option><option>Pi</option></select>`:`<span class="pill">${role==="Pa"?"Putra":"Putri"}</span>`}
@@ -781,7 +1265,7 @@ function viewAtur(){
     </div></div>`;
   if(!isAdmin() || readOnly) return kartuAkun + kartuEkspor;
   return kartuAkun + `<div class="card"><h2>Pengaturan semester</h2>
-    <table class="grid" style="max-width:720px">
+    <table class="kv">
       <tr><td>Nama pesantren / bagian</td><td><input style="width:100%" value="${esc(P.namaPesantren)}" oninput="setP('namaPesantren',this.value)"></td></tr>
       <tr><td>Nama semester</td><td><input style="width:100%" value="${esc(P.semester)}" oninput="setP('semester',this.value)"></td></tr>
       <tr><td>Tanggal periode pertama</td><td><input type="date" value="${P.mulai}" onchange="setP('mulai',this.value)"></td></tr>
@@ -816,6 +1300,7 @@ renderAll();
 if(role){ syncPull(); }
 /* pemasangan sebagai aplikasi (PWA): aktif hanya bila ditayangkan lewat https */
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+addEventListener("resize", ()=>{ if(tab==="lembar") fitSheets(); }, {passive:true});
 /* tombol kembali ke atas (layar sempit) */
 const totop=document.getElementById("totop");
 addEventListener("scroll",()=>totop.classList.toggle("show", scrollY>300),{passive:true});
